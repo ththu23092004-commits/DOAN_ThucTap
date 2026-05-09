@@ -4,6 +4,7 @@ using QRCoder;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VeSuKienWeb.Data;
@@ -15,10 +16,12 @@ namespace VeSuKienWeb.Controllers
     public class KhachHangController : Controller
     {
         private readonly NguCanhSuKien _db;
+        private readonly ILogger<KhachHangController> _logger;
 
-        public KhachHangController(NguCanhSuKien db)
+        public KhachHangController(NguCanhSuKien db, ILogger<KhachHangController> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
         private int GetCurrentUserId()
@@ -184,6 +187,26 @@ namespace VeSuKienWeb.Controllers
                     TenLoaiVe = g.LoaiVe.TenLoai ?? string.Empty,
                     GiaVe = g.LoaiVe.GiaVe
                 }).ToList();
+
+                var thongKeTheoHang = vm.GheList
+                    .GroupBy(g => g.Hang)
+                    .OrderBy(g => g.Key)
+                    .Select(g => new
+                    {
+                        Hang = g.Key,
+                        SoGhe = g.Count(),
+                        CotMin = g.Min(x => x.Cot),
+                        CotMax = g.Max(x => x.Cot),
+                        SoVip = g.Count(x => (x.TenLoaiVe ?? string.Empty).ToLower().Contains("vip"))
+                    })
+                    .ToList();
+
+                _logger.LogWarning(
+                    "[DatVeDebug] SuKienId={SuKienId}, LaWorkshop={LaWorkshop}, TongGhe={TongGhe}, TheoHang={@TheoHang}",
+                    sk.SuKienId,
+                    laWorkshop,
+                    vm.GheList.Count,
+                    thongKeTheoHang);
             }
             else
             {

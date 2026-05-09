@@ -30,7 +30,7 @@
                             <strong>Hình thức:</strong> Sự kiện trực tiếp - chọn chỗ ngồi trên sơ đồ.
                         </p>
 
-                        <div class="mb-2">
+                        <div class="mb-2 seat-legend">
                             <span class="badge bg-primary me-1">Ghế VIP</span>
                             <span class="badge bg-success">Ghế Thường</span>
                             <span class="badge bg-secondary ms-1">Đã đặt</span>
@@ -118,18 +118,37 @@
                             }
                             else
                             {
-                                var workshopRows = groupByHang.ToList();
-                                var leftRow = workshopRows.FirstOrDefault();
-                                var rightRow = workshopRows.Count > 1 ? workshopRows[1] : null;
-                                var bottomRows = workshopRows.Skip(2).ToList();
-                                var bottomSeats = bottomRows.SelectMany(r => r.OrderBy(g => g.Cot)).ToList();
+                                var workshopRows = Model.GheList
+                                    .GroupBy(g => g.Hang)
+                                    .OrderBy(g => g.Key)
+                                    .Select(g => g.OrderBy(x => x.Cot).ToList())
+                                    .ToList();
 
-                                <div class="workshop-layout-u">
-                                    <div class="workshop-u-body">
-                                        <div class="workshop-u-col">
-                                            @if (leftRow != null)
-                                            {
-                                                @foreach (var ghe in leftRow.OrderBy(g => g.Cot))
+                                var leftRowSeats = workshopRows.Count > 0 ? workshopRows[0] : new List<VeSuKienWeb.Models.KhachHang.DatVeGheItemVM>();
+                                var rightRowSeats = workshopRows.Count > 1 ? workshopRows[1] : new List<VeSuKienWeb.Models.KhachHang.DatVeGheItemVM>();
+                                var bottomSeats = workshopRows.Skip(2).SelectMany(r => r).ToList();
+
+                                // Ưu tiên giữ cạnh trái/phải theo đúng hàng chữ cái đầu (A/B) để không lẫn ghế từ hàng khác lên cánh dọc.
+                                var leftSeats = leftRowSeats.ToList();
+                                var rightSeats = rightRowSeats.ToList();
+
+                                var bottomInnerCount = (int)Math.Ceiling(bottomSeats.Count * 0.4);
+                                var innerBottomRow = bottomSeats.Take(bottomInnerCount).ToList();
+                                var outerBottomSeats = bottomSeats.Skip(bottomInnerCount).ToList();
+
+                                var leftOuterSeats = leftSeats.Where((g, idx) => idx % 2 == 0).ToList();
+                                var leftInnerSeats = leftSeats.Where((g, idx) => idx % 2 == 1).ToList();
+                                var rightInnerSeats = rightSeats.Where((g, idx) => idx % 2 == 0).ToList();
+                                var rightOuterSeats = rightSeats.Where((g, idx) => idx % 2 == 1).ToList();
+
+                                 <div class="workshop-layout-u">
+                                     <div class="workshop-ambient workshop-ambient-left"></div>
+                                     <div class="workshop-ambient workshop-ambient-right"></div>
+                                    <div class="workshop-container">
+                                        <div class="u-top-part">
+                                            <div class="side-wing left">
+                                                <div class="lane outer">
+                                                @foreach (var ghe in leftOuterSeats)
                                                 {
                                                     bool laVip = ghe.TenLoaiVe?.ToLower().Contains("vip") == true;
                                                     string btnClass = laVip ? "btn-outline-primary" : "btn-outline-success";
@@ -137,7 +156,7 @@
                                                     if (!string.Equals(ghe.TrangThai, "Trong", StringComparison.OrdinalIgnoreCase))
                                                     {
                                                         <button type="button" class="btn btn-sm btn-secondary workshop-seat" disabled>
-                                                            @leftRow.Key@ghe.Cot
+                                                            @ghe.Hang@ghe.Cot
                                                         </button>
                                                     }
                                                     else
@@ -147,19 +166,16 @@
                                                                    name="GheChonIds"
                                                                    value="@ghe.ChoNgoiId"
                                                                    class="form-check-input me-1" />
-                                                            @leftRow.Key@ghe.Cot
+                                                            @ghe.Hang@ghe.Cot
                                                         </label>
                                                     }
                                                 }
-                                            }
-                                        </div>
+                                                </div>
 
-                                        <div class="workshop-u-center"></div>
+                                                <div class="table-vertical"></div>
 
-                                        <div class="workshop-u-col">
-                                            @if (rightRow != null)
-                                            {
-                                                @foreach (var ghe in rightRow.OrderBy(g => g.Cot))
+                                                <div class="lane inner">
+                                                @foreach (var ghe in leftInnerSeats)
                                                 {
                                                     bool laVip = ghe.TenLoaiVe?.ToLower().Contains("vip") == true;
                                                     string btnClass = laVip ? "btn-outline-primary" : "btn-outline-success";
@@ -167,7 +183,7 @@
                                                     if (!string.Equals(ghe.TrangThai, "Trong", StringComparison.OrdinalIgnoreCase))
                                                     {
                                                         <button type="button" class="btn btn-sm btn-secondary workshop-seat" disabled>
-                                                            @rightRow.Key@ghe.Cot
+                                                            @ghe.Hang@ghe.Cot
                                                         </button>
                                                     }
                                                     else
@@ -177,37 +193,127 @@
                                                                    name="GheChonIds"
                                                                    value="@ghe.ChoNgoiId"
                                                                    class="form-check-input me-1" />
-                                                            @rightRow.Key@ghe.Cot
+                                                            @ghe.Hang@ghe.Cot
                                                         </label>
                                                     }
                                                 }
-                                            }
+                                                </div>
+                                            </div>
+
+                                            <div class="u-center-void"></div>
+
+                                            <div class="side-wing right">
+                                                <div class="lane inner">
+                                                @foreach (var ghe in rightInnerSeats)
+                                                {
+                                                    bool laVip = ghe.TenLoaiVe?.ToLower().Contains("vip") == true;
+                                                    string btnClass = laVip ? "btn-outline-primary" : "btn-outline-success";
+
+                                                    if (!string.Equals(ghe.TrangThai, "Trong", StringComparison.OrdinalIgnoreCase))
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-secondary workshop-seat" disabled>
+                                                            @ghe.Hang@ghe.Cot
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <label class="btn btn-sm @btnClass mb-0 workshop-seat">
+                                                            <input type="checkbox"
+                                                                   name="GheChonIds"
+                                                                   value="@ghe.ChoNgoiId"
+                                                                   class="form-check-input me-1" />
+                                                            @ghe.Hang@ghe.Cot
+                                                        </label>
+                                                    }
+                                                }
+                                                </div>
+
+                                                <div class="table-vertical"></div>
+
+                                                <div class="lane outer">
+                                                @foreach (var ghe in rightOuterSeats)
+                                                {
+                                                    bool laVip = ghe.TenLoaiVe?.ToLower().Contains("vip") == true;
+                                                    string btnClass = laVip ? "btn-outline-primary" : "btn-outline-success";
+
+                                                    if (!string.Equals(ghe.TrangThai, "Trong", StringComparison.OrdinalIgnoreCase))
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-secondary workshop-seat" disabled>
+                                                            @ghe.Hang@ghe.Cot
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <label class="btn btn-sm @btnClass mb-0 workshop-seat">
+                                                            <input type="checkbox"
+                                                                   name="GheChonIds"
+                                                                   value="@ghe.ChoNgoiId"
+                                                                   class="form-check-input me-1" />
+                                                            @ghe.Hang@ghe.Cot
+                                                        </label>
+                                                    }
+                                                }
+                                                </div>
+                                            </div>
+
                                         </div>
-                                    </div>
 
-                                    <div class="workshop-u-bottom">
-                                        @foreach (var ghe in bottomSeats)
-                                        {
-                                            bool laVip = ghe.TenLoaiVe?.ToLower().Contains("vip") == true;
-                                            string btnClass = laVip ? "btn-outline-primary" : "btn-outline-success";
+                                        <div class="u-bottom-part">
+                                            @if (innerBottomRow.Any())
+                                            {
+                                                <div class="lane inner-horizontal">
+                                                    @foreach (var ghe in innerBottomRow)
+                                                    {
+                                                        bool laVip = ghe.TenLoaiVe?.ToLower().Contains("vip") == true;
+                                                        string btnClass = laVip ? "btn-outline-primary" : "btn-outline-success";
 
-                                            if (!string.Equals(ghe.TrangThai, "Trong", StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                <button type="button" class="btn btn-sm btn-secondary workshop-seat" disabled>
-                                                    @ghe.Hang@ghe.Cot
-                                                </button>
+                                                        if (!string.Equals(ghe.TrangThai, "Trong", StringComparison.OrdinalIgnoreCase))
+                                                        {
+                                                            <button type="button" class="btn btn-sm btn-secondary workshop-seat" disabled>
+                                                                @ghe.Hang@ghe.Cot
+                                                            </button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label class="btn btn-sm @btnClass mb-0 workshop-seat">
+                                                                <input type="checkbox"
+                                                                       name="GheChonIds"
+                                                                       value="@ghe.ChoNgoiId"
+                                                                       class="form-check-input me-1" />
+                                                                @ghe.Hang@ghe.Cot
+                                                            </label>
+                                                        }
+                                                    }
+                                                </div>
                                             }
-                                            else
+
+                                            <div class="table-horizontal"></div>
+
+                                            <div class="lane outer-horizontal">
+                                            @foreach (var ghe in outerBottomSeats)
                                             {
-                                                <label class="btn btn-sm @btnClass mb-0 workshop-seat">
-                                                    <input type="checkbox"
-                                                           name="GheChonIds"
-                                                           value="@ghe.ChoNgoiId"
-                                                           class="form-check-input me-1" />
-                                                    @ghe.Hang@ghe.Cot
-                                                </label>
+                                                bool laVip = ghe.TenLoaiVe?.ToLower().Contains("vip") == true;
+                                                string btnClass = laVip ? "btn-outline-primary" : "btn-outline-success";
+
+                                                if (!string.Equals(ghe.TrangThai, "Trong", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-secondary workshop-seat" disabled>
+                                                        @ghe.Hang@ghe.Cot
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <label class="btn btn-sm @btnClass mb-0 workshop-seat">
+                                                        <input type="checkbox"
+                                                               name="GheChonIds"
+                                                               value="@ghe.ChoNgoiId"
+                                                               class="form-check-input me-1" />
+                                                        @ghe.Hang@ghe.Cot
+                                                    </label>
+                                                }
                                             }
-                                        }
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -260,7 +366,7 @@
             <div class="card-body small text-muted">
                 <ul class="mb-0">
                     <li>Sau bước này, hệ thống sẽ tạo đơn hàng và chuyển sang màn hình thanh toán.</li>
-                    <li></li>
+                    <li>Ghế VIP và ghế thường hiển thị theo màu khác nhau để dễ chọn nhanh.</li>
                     <li>Với sự kiện trực tuyến, link tham gia và mật khẩu sẽ hiển thị sau khi thanh toán thành công.</li>
                 </ul>
             </div>
@@ -314,68 +420,176 @@
     }
 
     .workshop-title {
-        font-size: 2rem;
+        font-size: 2.2rem;
         font-weight: 800;
-        letter-spacing: 1px;
+        letter-spacing: 1.4px;
+        color: #0f172a;
     }
 
     .workshop-layout-u {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        max-width: 760px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 18px;
+        background: radial-gradient(circle at top right, #eefaf6 0%, #d8f2ea 40%, #c9e8df 100%);
+        padding: 20px 18px;
+        border: 1px solid #b9ddd2;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
     }
 
-    .workshop-u-body {
-        display: flex;
-        justify-content: space-between;
-        align-items: stretch;
-        gap: 18px;
+    .workshop-ambient {
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border-radius: 999px;
+        pointer-events: none;
+        filter: blur(2px);
+        opacity: .45;
     }
 
-    .workshop-u-col {
+    .workshop-ambient-left {
+        top: -50px;
+        left: -40px;
+        background: radial-gradient(circle, #c8efe1 0%, transparent 70%);
+    }
+
+    .workshop-ambient-right {
+        bottom: -60px;
+        right: -30px;
+        background: radial-gradient(circle, #bfe7d8 0%, transparent 70%);
+    }
+
+    .seat-legend .badge {
+        border-radius: 999px;
+        padding: 7px 11px;
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    .workshop-container {
         display: flex;
         flex-direction: column;
-        flex-wrap: wrap;
         gap: 10px;
-        min-width: 120px;
-    }
-
-    .workshop-u-center {
-        flex: 1;
-        border-left: 4px solid #2f2f2f;
-        border-right: 4px solid #2f2f2f;
-        border-bottom: 4px solid #2f2f2f;
-        border-radius: 0 0 6px 6px;
-        min-height: 180px;
-        background: rgba(240, 248, 245, 0.45);
-    }
-
-    .workshop-u-bottom {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding-top: 10px;
-        max-width: 620px;
+        max-width: 760px;
         margin: 0 auto;
     }
 
+    .u-top-part {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .side-wing {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .u-center-void {
+        flex: 1;
+        min-width: 170px;
+    }
+
+    .lane {
+        display: flex;
+        gap: 8px;
+    }
+
+    .side-wing .lane {
+        flex-direction: column;
+        width: 92px;
+    }
+
+    .table-vertical {
+        width: 30px;
+        min-height: 230px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(225, 245, 238, 0.62));
+        border: 6px solid #0f172a;
+        border-bottom: 0;
+        border-radius: 8px 8px 0 0;
+        align-self: stretch;
+    }
+
+    .u-bottom-part {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .inner-horizontal,
+    .outer-horizontal {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .table-horizontal {
+        width: min(620px, 100%);
+        min-height: 34px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(225, 245, 238, 0.62));
+        border-left: 6px solid #0f172a;
+        border-right: 6px solid #0f172a;
+        border-bottom: 6px solid #0f172a;
+        border-radius: 0 0 12px 12px;
+    }
+
     .workshop-seat {
-        min-width: 76px;
+        min-width: 70px;
+        border-radius: 999px;
+        font-weight: 600;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .workshop-seat:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 12px rgba(15, 23, 42, 0.15);
     }
 
     @@media (max-width: 768px) {
-        .workshop-u-body {
-            gap: 10px;
+        .workshop-layout-u {
+            padding: 14px 10px;
         }
 
-        .workshop-u-center {
-            min-height: 120px;
+        .u-top-part {
+            gap: 6px;
+        }
+
+        .u-center-void {
+            min-width: 60px;
+        }
+
+        .side-wing {
+            gap: 6px;
+        }
+
+        .side-wing .lane {
+            width: 58px;
+            gap: 6px;
+        }
+
+        .table-vertical {
+            width: 20px;
+            min-height: 150px;
+            border-width: 4px;
+            border-bottom: 0;
+        }
+
+        .u-bottom-part {
+            gap: 6px;
+        }
+
+        .table-horizontal {
+            min-height: 24px;
+            border-left-width: 4px;
+            border-right-width: 4px;
+            border-bottom-width: 4px;
         }
 
         .workshop-seat {
-            min-width: 64px;
+            min-width: 58px;
             font-size: 0.8rem;
         }
     }

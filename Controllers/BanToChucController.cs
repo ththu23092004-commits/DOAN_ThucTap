@@ -275,13 +275,9 @@ namespace VeSuKienWeb.Controllers
             bool laTrucTiep = tenLoaiLower.Contains("trực tiếp") || tenLoaiLower.Contains("truc tiep");
             bool laWorkshop = tenLoaiLower.Contains("workshop");
 
-            // Workshop: khóa cứng sơ đồ 30 ghế (5 hàng x 6 cột) để tránh tạo dư ghế.
+            // Workshop: giữ preset ở UI, nhưng backend cho phép organizer tùy chỉnh số ghế/hàng/cột.
             if (laWorkshop)
             {
-                model.SoHang = 5;
-                model.SoCotMoiHang = 6;
-                model.SoChoNgoi = 30;
-
                 // Khoảng VIP mặc định hợp lệ nếu người dùng để trống.
                 if (!model.HangVipTu.HasValue || model.HangVipTu.Value < 1)
                     model.HangVipTu = 1;

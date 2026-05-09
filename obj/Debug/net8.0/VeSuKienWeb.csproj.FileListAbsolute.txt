@@ -149,3 +149,4 @@ C:\Users\Thang\Downloads\DACN_1150070041_CaoTongThienThu_11DHTMDT_sourcecode\VeS
 C:\Users\Thang\Downloads\DACN_1150070041_CaoTongThienThu_11DHTMDT_sourcecode\VeSuKienWeb_minimal_structure\obj\Debug\net8.0\VeSuKienWeb.pdb
 C:\Users\Thang\Downloads\DACN_1150070041_CaoTongThienThu_11DHTMDT_sourcecode\VeSuKienWeb_minimal_structure\obj\Debug\net8.0\VeSuKienWeb.genruntimeconfig.cache
 C:\Users\Thang\Downloads\DACN_1150070041_CaoTongThienThu_11DHTMDT_sourcecode\VeSuKienWeb_minimal_structure\obj\Debug\net8.0\ref\VeSuKienWeb.dll
+C:\Users\Thang\Downloads\DACN_1150070041_CaoTongThienThu_11DHTMDT_sourcecode\VeSuKienWeb_minimal_structure\obj\Debug\net8.0\VeSuKienWeb.sourcelink.json
