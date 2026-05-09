@@ -1,0 +1,45 @@
+@model VeSuKienWeb.Models.KhachHang.YeuCauHoanHuyVM
+
+@{
+    ViewData["Title"] = "Yêu cầu hủy/hoàn vé";
+}
+
+<h2 class="mb-3">Yêu cầu hủy vé</h2>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Model.TenSuKien</h5>
+
+        <p class="mb-1">
+            <strong>Mã vé:</strong> @Model.MaVe
+        </p>
+
+        <p class="mb-1">
+            <strong>Thời gian:</strong>
+            @Model.ThoiGianBatDau.ToString("HH:mm dd/MM/yyyy")
+        </p>
+
+        <p class="mb-0">
+            <strong>Số tiền:</strong> @Model.SoTien.ToString("N0") đ
+        </p>
+    </div>
+</div>
+
+<form asp-action="YeuCauHoanHuy" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="VeId" />
+
+    <div class="mb-3">
+        <label asp-for="LyDo" class="form-label"></label>
+        <textarea asp-for="LyDo" class="form-control" rows="4"
+                  placeholder="Vui lòng mô tả lý do hủy vé..."></textarea>
+        <span asp-validation-for="LyDo" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-danger">
+        Gửi yêu cầu
+    </button>
+    <a asp-action="VeCuaToi" class="btn btn-secondary ms-2">
+        Quay lại
+    </a>
+</form>

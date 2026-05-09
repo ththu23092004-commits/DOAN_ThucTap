@@ -1,0 +1,214 @@
+@model VeSuKienWeb.Models.BanToChuc.SuKienChiTietBtcVM
+
+@{
+    Layout = "~/Views/Shared/_LayoutBanToChuc.cshtml";
+
+    var sk = Model.SuKien;
+    var loai = Model.LoaiSuKien;
+    var toChuc = Model.ToChuc;
+    var diaDiem = Model.DiaDiem;
+    var online = Model.SuKienTrucTuyen;
+
+    ViewData["Title"] = "Chi tiết sự kiện (Ban tổ chức)";
+}
+
+<h2 class="mb-3">Chi tiết sự kiện</h2>
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h3 class="fw-bold">@sk.TenSuKien</h3>
+        <div class="d-flex flex-wrap align-items-center gap-2 text-muted small mt-1">
+            @if (loai != null)
+            {
+                <span class="badge bg-secondary">@loai.TenLoai</span>
+            }
+            <span>
+                @sk.ThoiGianBatDau.ToString("HH:mm dd/MM/yyyy")
+                →
+                @sk.ThoiGianKetThuc.ToString("HH:mm dd/MM/yyyy")
+            </span>
+            @if (toChuc != null)
+            {
+                <span>&bull; Tổ chức: <strong>@toChuc.TenToChuc</strong></span>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <div class="text-muted small">Tổng doanh thu (ước tính)</div>
+        <div class="fs-4 fw-bold text-primary">
+            @Model.TongDoanhThu.ToString("N0") đ
+        </div>
+        <div class="small text-muted">
+            @Model.TongVeDaBan vé đã bán
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- CỘT TRÁI -->
+    <div class="col-md-8">
+
+        <!-- Giới thiệu -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-light"><strong>Giới thiệu sự kiện</strong></div>
+            <div class="card-body">
+                @if (!string.IsNullOrWhiteSpace(sk.MoTaChiTiet))
+                {
+                    <p>@sk.MoTaChiTiet</p>
+                }
+                else
+                {
+                    <p class="text-muted"><em>Chưa có mô tả chi tiết.</em></p>
+                }
+
+                <p class="mb-1"><strong>Ngày đăng:</strong> @sk.NgayDang.ToString("dd/MM/yyyy HH:mm")</p>
+                <p class="mb-1"><strong>Số lượng tối đa:</strong> @(sk.SoLuongToiDa?.ToString() ?? "Chưa cấu hình")</p>
+                <p class="mb-0">
+                    <strong>Giá vé mặc định:</strong>
+                    @(sk.GiaVeMacDinh.HasValue ? sk.GiaVeMacDinh.Value.ToString("N0") + " đ" : "Chưa đặt")
+                </p>
+            </div>
+        </div>
+
+        <!-- Sự kiện trực tiếp -->
+        @if (diaDiem != null)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light"><strong>Sự kiện trực tiếp</strong></div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Địa điểm:</strong> @diaDiem.TenDiaDiem</p>
+                    <p class="mb-1"><strong>Địa chỉ:</strong> @diaDiem.DiaChi</p>
+                    <p class="mb-1"><strong>Tổng số ghế:</strong> @diaDiem.SoChoNgoi</p>
+                    @if (!string.IsNullOrWhiteSpace(diaDiem.BanDo))
+                    {
+                        <p class="mb-0">
+                            <strong>Bản đồ:</strong>
+                            <a href="@diaDiem.BanDo" target="_blank">Mở Google Maps</a>
+                        </p>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Sự kiện trực tuyến -->
+        @if (online != null)
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light"><strong>Sự kiện trực tuyến</strong></div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Nền tảng:</strong> @online.NenTang</p>
+                    <p class="mb-1">
+                        <strong>Link xem:</strong>
+                        <a href="@online.LinkXem" target="_blank">@online.LinkXem</a>
+                    </p>
+                    <p class="mb-1"><strong>Mật khẩu phòng:</strong> @(online.MatKhauPhong ?? "(Không có)")</p>
+                    @if (!string.IsNullOrWhiteSpace(online.HuongDan))
+                    {
+                        <p class="mb-0"><strong>Hướng dẫn:</strong><br />@online.HuongDan</p>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Loại vé -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-light"><strong>Loại vé & tồn kho</strong></div>
+            <div class="card-body">
+                @if (Model.ThongKeTheoLoaiVe.Any())
+                {
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Loại vé</th>
+                                <th>Giá</th>
+                                <th>Cấu hình</th>
+                                <th>Đã bán</th>
+                                <th>Còn lại</th>
+                                <th>Doanh thu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ThongKeTheoLoaiVe)
+                            {
+                                <tr>
+                                    <td>@item.TenLoai</td>
+                                    <td>@item.GiaVe.ToString("N0") đ</td>
+                                    <td>@item.SoLuongConfig</td>
+                                    <td>@item.SoLuongDaBan</td>
+                                    <td>@item.SoLuongConLai</td>
+                                    <td>@item.DoanhThu.ToString("N0") đ</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted"><em>Chưa cấu hình loại vé.</em></p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- CỘT PHẢI (ACTION QUAN TRỌNG) -->
+    <div class="col-md-4">
+
+        <!-- THỐNG KÊ -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-light"><strong>Tổng quan thống kê</strong></div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Vé đã bán:</strong> @Model.TongVeDaBan</p>
+                <p class="mb-1"><strong>Đã check-in:</strong> @Model.TongCheckIn</p>
+                <p class="mb-1"><strong>Yêu cầu hoàn/hủy:</strong> @Model.TongYeuCauHoanHuy</p>
+                <p class="mb-0"><strong>Đang chờ xử lý:</strong> @Model.TongYeuCauHoanHuyChoDuyet</p>
+            </div>
+        </div>
+
+        <!-- THÔNG TIN TỔ CHỨC -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-light"><strong>Thông tin tổ chức</strong></div>
+            <div class="card-body">
+                @if (toChuc != null)
+                {
+                    <p class="mb-1"><strong>@toChuc.TenToChuc</strong></p>
+                    <p class="mb-1">Email: @toChuc.EmailLienHe</p>
+                    <p class="mb-0 text-muted small">
+                        @(string.IsNullOrWhiteSpace(toChuc.MoTa) ? "(Chưa có mô tả tổ chức)" : toChuc.MoTa)
+                    </p>
+                }
+                else
+                {
+                    <p class="text-muted"><em>Chưa có thông tin tổ chức.</em></p>
+                }
+            </div>
+        </div>
+
+        <!-- NHÓM NÚT CHỨC NĂNG -->
+        <div class="d-grid gap-2 mb-3">
+
+            <a asp-action="QuanLyVe"
+               asp-route-id="@sk.SuKienId"
+               class="btn btn-outline-primary">
+                <i class="bi bi-tags"></i> Quản lý loại vé
+            </a>
+
+            <a asp-action="DanhSachVe"
+               asp-route-id="@sk.SuKienId"
+               class="btn btn-outline-primary">
+                <i class="bi bi-people"></i> Danh sách vé / tham gia
+            </a>
+
+            <a asp-action="GuiThongBao"
+               asp-route-id="@sk.SuKienId"
+               class="btn btn-outline-primary">
+                <i class="bi bi-megaphone"></i> Gửi thông báo
+            </a>
+
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary w-100">
+            « Quay lại danh sách sự kiện
+        </a>
+    </div>
+</div>

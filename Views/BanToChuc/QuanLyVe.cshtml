@@ -1,0 +1,202 @@
+
+@model VeSuKienWeb.Models.BanToChuc.QuanLyVeBtcVM
+
+@{
+    Layout = "~/Views/Shared/_LayoutBanToChuc.cshtml";
+    ViewData["Title"] = "Quản lý loại vé";
+
+    var loiLoaiVe = ViewBag.LoiLoaiVe as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">Quản lý loại vé</h2>
+        <div class="text-muted small">
+            Sự kiện: <strong>@Model.TenSuKien</strong>
+        </div>
+    </div>
+    <a asp-action="ChiTiet" asp-route-id="@Model.SuKienId" class="btn btn-outline-secondary">
+        &laquo; Quay lại chi tiết sự kiện
+    </a>
+</div>
+
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-success">@TempData["ThongBao"]</div>
+}
+
+@if (!string.IsNullOrEmpty(loiLoaiVe))
+{
+    <div class="alert alert-warning">@loiLoaiVe</div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- DANH SÁCH LOẠI VÉ -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <strong>Các loại vé đã cấu hình</strong>
+                <span class="small text-muted">Sửa trực tiếp trên bảng & lưu lại</span>
+            </div>
+            <div class="card-body">
+                @if (Model.LoaiVes != null && Model.LoaiVes.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th style="width: 18%">Loại vé</th>
+                                    <th style="width: 15%">Giá (đ)</th>
+                                    <th style="width: 10%">Số lượng</th>
+                                    <th style="width: 10%">Đã bán</th>
+                                    <th style="width: 10%">Còn lại</th>
+                                    <th>Mô tả</th>
+                                    <th style="width: 18%">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.LoaiVes)
+                                {
+                                    var conLai = item.SoLuongConfig - item.SoLuongDaBan;
+
+                                    <tr>
+                                        <!-- FORM CẬP NHẬT TỪNG DÒNG -->
+                                        <form asp-action="CapNhatLoaiVe" method="post" class="align-middle">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="LoaiVeId" value="@item.LoaiVeId" />
+                                            <input type="hidden" name="SuKienId" value="@Model.SuKienId" />
+
+                                            <td>
+                                                <input name="TenLoai"
+                                                       class="form-control form-control-sm"
+                                                       value="@item.TenLoai" />
+                                            </td>
+                                            <td>
+                                                <input name="GiaVe"
+                                                       type="number"
+                                                       min="0"
+                                                       step="1000"
+                                                       class="form-control form-control-sm text-end"
+                                                       value="@item.GiaVe" />
+                                            </td>
+                                            <td>
+                                                <input name="SoLuong"
+                                                       type="number"
+                                                       min="1"
+                                                       class="form-control form-control-sm text-end"
+                                                       value="@item.SoLuongConfig" />
+                                            </td>
+                                            <td class="text-end">
+                                                @item.SoLuongDaBan
+                                            </td>
+                                            <td class="text-end">
+                                                @conLai
+                                            </td>
+                                            <td>
+                                                <input name="MoTa"
+                                                       class="form-control form-control-sm"
+                                                       value="@item.MoTa" />
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <button type="submit" class="btn btn-sm btn-primary">
+                                                        Lưu
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </form>
+
+                                        <!-- FORM XÓA RIÊNG (nếu chưa có vé nào) -->
+                                        <td class="d-none">
+                                            @* chỗ này chỉ để tránh lỗi layout khi dùng 2 form trong cùng tr *@
+                                        </td>
+                                        <td class="text-end" style="border-top: none;">
+                                            <form asp-action="XoaLoaiVe" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.LoaiVeId" />
+                                                <input type="hidden" name="suKienId" value="@Model.SuKienId" />
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Bạn có chắc muốn xóa loại vé này? Chỉ xóa được khi chưa có vé nào đã bán.');">
+                                                    Xóa
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">
+                        <em>Chưa có loại vé nào. Hãy thêm bên khung "Thêm loại vé mới".</em>
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- CỘT PHẢI: THÊM LOẠI VÉ MỚI -->
+    <div class="col-md-4">
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-light">
+                <strong>Thêm loại vé mới</strong>
+            </div>
+            <div class="card-body">
+                <form asp-action="ThemLoaiVe" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="SuKienId" value="@Model.SuKienId" />
+
+                    <div class="mb-2">
+                        <label class="form-label small">Tên loại vé</label>
+                        <input name="TenLoai"
+                               class="form-control form-control-sm"
+                               placeholder="VD: VIP, Thường, Early Bird" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label small">Giá vé (đ)</label>
+                        <input name="GiaVe"
+                               type="number"
+                               min="0"
+                               step="1000"
+                               class="form-control form-control-sm"
+                               placeholder="VD: 150000" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label small">Số lượng</label>
+                        <input name="SoLuong"
+                               type="number"
+                               min="1"
+                               class="form-control form-control-sm"
+                               placeholder="VD: 100" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small">Mô tả</label>
+                        <textarea name="MoTa"
+                                  rows="3"
+                                  class="form-control form-control-sm"
+                                  placeholder="VD: Khu ngồi gần sân khấu, bao gồm thức uống miễn phí..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        Thêm loại vé
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="alert alert-light border small">
+            <div class="fw-semibold mb-1">Gợi ý cấu hình vé</div>
+            <ul class="mb-0 ps-3">
+                <li>VIP: số lượng ít, giá cao, mô tả rõ quyền lợi.</li>
+                <li>Thường: số lượng nhiều, giá trung bình.</li>
+                <li>Early Bird: số lượng giới hạn, bán trước, giá ưu đãi.</li>
+            </ul>
+        </div>
+    </div>
+</div>

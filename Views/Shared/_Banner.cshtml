@@ -1,0 +1,52 @@
+@* Banner dùng chung *@
+<div class="hero-banner hero-slider rounded-4 mb-4 text-white overflow-hidden position-relative">
+    <!-- LỚP PHỦ XÁM (INLINE CHO CHẮC CHẮN HIỆN) -->
+    <div class="hero-overlay-layer"
+         style="
+            position:absolute;
+            inset:0;
+            background:linear-gradient(
+                180deg,
+                rgba(0,0,0,0.2),
+                rgba(0,0,0,0.45)
+            );
+            pointer-events:none;
+            z-index:1;">
+    </div>
+
+    <!-- NỘI DUNG CHỮ + FORM -->
+    <div class="container py-4 py-lg-5 position-relative" style="z-index:2;">
+        <div class="row align-items-center gy-4">
+            <div class="col-lg-6">
+                <h1 class="display-5 fw-bold mb-3 hero-title">
+                    Đặt vé sự kiện<br />trực tiếp & trực tuyến
+                </h1>
+                <p class="lead mb-4 hero-subtitle">
+                    Khám phá hàng trăm sự kiện âm nhạc, hội thảo, workshop, livestream...
+                    và giữ chỗ chỉ trong vài giây.
+                </p>
+            </div>
+
+            <div class="col-lg-5 offset-lg-1">
+                <div class="search-card bg-white text-dark p-4 rounded-4 shadow-lg">
+                    <h5 class="fw-semibold mb-3 text-center">Tìm kiếm sự kiện</h5>
+
+                    <form method="get" action="/KhachHang/Index" class="mb-3">
+<div class="search-input-wrapper">
+    <input type="text"
+           name="search"
+           class="search-input-beauty"
+           placeholder="Tên sự kiện, ca sĩ, địa điểm..." />
+
+    <button type="submit" class="search-button-beauty">
+        <i class="bi bi-search"></i> Tìm kiếm
+    </button>
+</div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

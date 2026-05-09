@@ -1,0 +1,25 @@
+
+@model VeSuKienWeb.Models.DonHang
+
+@{
+    ViewData["Title"] = "Thanh toán thành công";
+}
+
+<div class="card shadow-sm">
+    <div class="card-body text-center">
+        <h3 class="text-success mb-2">Thanh toán thành công</h3>
+        <p class="mb-2">
+            Đơn hàng <strong>#@Model.DonHangId</strong> đã được xác nhận thanh toán.
+        </p>
+        <p class="small text-muted mb-3">
+            Vé của bạn đã được kích hoạt.  
+            Với sự kiện trực tuyến, link tham gia và mật khẩu phòng sẽ hiển thị trong màn hình "Vé của tôi" (sẽ xây dựng sau).
+        </p>
+
+        <a asp-controller="KhachHang"
+           asp-action="Index"
+           class="btn btn-primary me-2">
+            Tiếp tục xem sự kiện khác
+        </a>
+    </div>
+</div>

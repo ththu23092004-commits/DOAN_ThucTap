@@ -1,0 +1,187 @@
+@model List<VeSuKienWeb.Models.BanToChuc.ThongKeDoanhThuItemVM>
+
+@{
+    Layout = "~/Views/Shared/_LayoutBanToChuc.cshtml";
+    ViewData["Title"] = "Thống kê tổng quan";
+
+    var q = Context.Request.Query["q"].ToString();
+
+    var data = Model ?? new List<VeSuKienWeb.Models.BanToChuc.ThongKeDoanhThuItemVM>();
+
+    // 🔍 Tìm kiếm theo tên sự kiện
+    if (!string.IsNullOrWhiteSpace(q))
+    {
+        data = data
+            .Where(x => (x.TenSuKien ?? "")
+            .Contains(q, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    // Tổng quan theo danh sách đang hiển thị
+    decimal tongDoanhThu = data.Sum(x => x.DoanhThuThucTe);
+    int tongVe = data.Sum(x => x.TongSoVe);
+    int tongVeDaThanhToan = data.Sum(x => x.VeDaThanhToan);
+    int tongVeDaHuy = data.Sum(x => x.VeDaHuy);
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h4 class="mb-1">Thống kê doanh thu theo sự kiện</h4>
+        <div class="text-muted small">
+            Doanh thu tính theo giao dịch <strong>ThanhCong</strong> và vé <strong>DaThanhToan</strong>.
+        </div>
+    </div>
+</div>
+
+<!-- 🔍 Bộ lọc tìm kiếm -->
+<form method="get" class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-8">
+                <label class="form-label small text-muted">Tìm theo tên sự kiện</label>
+                <input type="text" name="q" class="form-control"
+                       value="@q" placeholder="Nhập tên sự kiện..." />
+            </div>
+
+            <div class="col-6 col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">
+                    Tìm kiếm
+                </button>
+            </div>
+
+            <div class="col-6 col-md-2 d-grid">
+                <a asp-action="ThongKeTongQuan"
+                   class="btn btn-outline-secondary">
+                    Xóa lọc
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- 📊 Thẻ tổng quan -->
+<div class="row g-3 mb-3">
+    <div class="col-12 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Tổng doanh thu</div>
+                <div class="fs-5 fw-semibold">@tongDoanhThu.ToString("N0") đ</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Tổng vé</div>
+                <div class="fs-5 fw-semibold">@tongVe</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Vé đã thanh toán</div>
+                <div class="fs-5 fw-semibold">@tongVeDaThanhToan</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Vé đã hủy</div>
+                <div class="fs-5 fw-semibold">@tongVeDaHuy</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 📋 Bảng thống kê theo sự kiện -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <div>
+            <div class="fw-semibold">Bảng thống kê theo sự kiện</div>
+            <div class="text-muted small">Sắp xếp theo doanh thu giảm dần</div>
+        </div>
+        <div class="text-muted small">
+            Số sự kiện: <span class="fw-semibold">@data.Count</span>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:60px">#</th>
+                        <th>Sự kiện</th>
+                        <th style="width:240px">Thời gian</th>
+                        <th class="text-end">Tổng vé</th>
+                        <th class="text-end">Vé đã bán</th>
+                        <th class="text-end">Vé hủy</th>
+                        <th class="text-end">Doanh thu</th>
+                        <th class="text-end">Tiến độ</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                @if (!data.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="text-center p-4 text-muted">
+                            Không có dữ liệu thống kê.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    var stt = 1;
+                    foreach (var item in data.OrderByDescending(x => x.DoanhThuThucTe))
+                    {
+                        var rate = item.TongSoVe > 0
+                            ? item.VeDaThanhToan * 100.0 / item.TongSoVe
+                            : 0;
+
+                        <tr>
+                            <td>@stt</td>
+                            <td class="fw-semibold">@item.TenSuKien</td>
+                            <td class="small text-muted">
+                                @item.ThoiGianBatDau:dd/MM/yyyy HH:mm
+                                –
+                                @item.ThoiGianKetThuc:dd/MM/yyyy HH:mm
+                            </td>
+                            <td class="text-end">@item.TongSoVe</td>
+                            <td class="text-end fw-semibold">@item.VeDaThanhToan</td>
+                            <td class="text-end">@item.VeDaHuy</td>
+                            <td class="text-end fw-semibold">
+                                @item.DoanhThuThucTe.ToString("N0") đ
+                            </td>
+                            <td class="text-end">
+                                <div class="small text-muted mb-1">
+                                    @item.VeDaThanhToan/@item.TongSoVe (@rate.ToString("0.0")%)
+                                </div>
+                                <div class="progress" style="height:8px;">
+                                    <div class="progress-bar"
+                                         style="width:@rate.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)%">
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-action="ChiTiet"
+                                   asp-route-id="@item.SuKienId">
+                                    Chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                        stt++;
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

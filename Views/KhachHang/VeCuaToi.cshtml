@@ -1,0 +1,141 @@
+@model IEnumerable<VeSuKienWeb.Models.KhachHang.VeCuaToiItemVM>
+
+@{
+    ViewData["Title"] = "Vé của tôi";
+}
+
+<h2 class="mb-4">Vé của tôi</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">
+        Bạn chưa có vé nào trong hệ thống.
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var ve in Model)
+        {
+            // Badge trạng thái
+            string badgeClass = ve.TrangThaiVe switch
+            {
+                "DaThanhToan" => "badge bg-success",
+                "ChuaThanhToan" => "badge bg-warning text-dark",
+                "Huy" => "badge bg-secondary",
+                _ => "badge bg-light text-dark"
+            };
+
+            // Text hiển thị trạng thái cho người dùng
+            string trangThaiHienThi = ve.TrangThaiVe switch
+            {
+                "DaThanhToan" => "Đã thanh toán",
+                "ChuaThanhToan" => "Chưa thanh toán",
+                "Huy" => "Đã hủy",
+                _ => ve.TrangThaiVe
+            };
+
+            string viTriGhe = (ve.Hang != null && ve.Cot.HasValue)
+                ? $"{ve.Hang}{ve.Cot}"
+                : "Ghế tự do";
+
+            <div class="col-12 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="@badgeClass">@trangThaiHienThi</span>
+                        </div>
+                        <small class="text-muted">
+                            Mã vé: <strong>@ve.MaVe</strong>
+                        </small>
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title mb-2">@ve.TenSuKien</h5>
+
+                        <p class="mb-1">
+                            <i class="bi bi-calendar3"></i>
+                            @ve.ThoiGianBatDau.ToString("HH:mm dd/MM/yyyy")
+                            -
+                            @ve.ThoiGianKetThuc.ToString("HH:mm dd/MM/yyyy")
+                        </p>
+
+                        @if (ve.LaTrucTiep)
+                        {
+                            <p class="mb-1">
+                                <i class="bi bi-geo-alt"></i>
+                                <strong>@ve.DiaDiem</strong><br />
+                                <span class="text-muted">@ve.DiaChi</span>
+                            </p>
+                        }
+                        else if (ve.LaTrucTuyen)
+                        {
+                            <p class="mb-1">
+                                <i class="bi bi-camera-video"></i>
+                                Sự kiện trực tuyến trên:
+                                <strong>@ve.OnlineNenTang</strong><br />
+                                @if (!string.IsNullOrEmpty(ve.OnlineLinkXem))
+                                {
+                                    <a href="@ve.OnlineLinkXem" target="_blank">Vào phòng sự kiện</a>
+                                }
+                            </p>
+                        }
+
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-4 col-6 mb-2">
+                                <div class="small text-muted">Loại vé</div>
+                                <div><strong>@ve.TenLoaiVe</strong></div>
+                            </div>
+                            <div class="col-md-4 col-6 mb-2">
+                                <div class="small text-muted">Ghế</div>
+                                <div><strong>@viTriGhe</strong></div>
+                            </div>
+                            <div class="col-md-4 col-6 mb-2">
+                                <div class="small text-muted">Giá vé</div>
+                                <div><strong>@ve.GiaVe.ToString("N0") đ</strong></div>
+                            </div>
+                            <div class="col-md-4 col-6 mb-2">
+                                <div class="small text-muted">Ngày đặt</div>
+                                <div>@ve.NgayDat.ToString("dd/MM/yyyy HH:mm")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            * Vui lòng mang mã vé (hoặc mã QR) khi tham gia sự kiện.
+                        </div>
+
+                        <div>
+<a asp-controller="KhachHang"
+   asp-action="ChiTietVe"
+   asp-route-veId="@ve.VeId"
+   class="btn btn-outline-primary btn-sm">
+    Xem chi tiết sự kiện
+</a>
+
+<a asp-controller="KhachHang"
+   asp-action="XemMaQr"
+   asp-route-veId="@ve.VeId"
+   class="btn btn-outline-secondary btn-sm">
+    Xem mã QR
+</a>
+
+                            @if (ve.CoTheHuy)
+                            {
+                                <a asp-controller="KhachHang"
+                                   asp-action="YeuCauHoanHuy"
+                                   asp-route-veId="@ve.VeId"
+                                   class="btn btn-outline-danger btn-sm ms-1">
+                                    Yêu cầu hủy/hoàn vé
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

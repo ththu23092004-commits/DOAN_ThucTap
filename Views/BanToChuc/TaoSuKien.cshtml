@@ -1,0 +1,453 @@
+@model VeSuKienWeb.Models.BanToChuc.TaoSuKienYeuCau
+@{
+    ViewData["Title"] = "Tạo sự kiện mới";
+}
+
+<h2 class="mb-3">Tạo sự kiện mới</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="TaoSuKien" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <label asp-for="TenSuKien" class="form-label"></label>
+                        <input asp-for="TenSuKien" class="form-control" />
+                        <span asp-validation-for="TenSuKien" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="MoTaChiTiet" class="form-label"></label>
+                        <textarea asp-for="MoTaChiTiet" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="MoTaChiTiet" class="text-danger small"></span>
+                    </div>
+
+                    @* ⭐ ẢNH SỰ KIỆN *@
+                    <div class="mb-3">
+                        <label class="form-label">Ảnh sự kiện</label>
+                        <input type="file" name="AnhSuKienFile" class="form-control" />
+                        <div class="form-text">Chọn ảnh đại diện cho sự kiện (JPG, PNG...).</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="LoaiId" class="form-label"></label>
+                        <select asp-for="LoaiId" asp-items="ViewBag.LoaiId" class="form-select" id="LoaiId"></select>
+                        <span asp-validation-for="LoaiId" class="text-danger small"></span>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <label asp-for="ThoiGianBatDau" class="form-label"></label>
+                        <input asp-for="ThoiGianBatDau"
+                               type="datetime-local"
+                               class="form-control"
+                               value="@Model.ThoiGianBatDau.ToString("yyyy-MM-ddTHH:mm")" />
+                        <span asp-validation-for="ThoiGianBatDau" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ThoiGianKetThuc" class="form-label"></label>
+                        <input asp-for="ThoiGianKetThuc"
+                               type="datetime-local"
+                               class="form-control"
+                               value="@Model.ThoiGianKetThuc.ToString("yyyy-MM-ddTHH:mm")" />
+                        <span asp-validation-for="ThoiGianKetThuc" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SoLuongToiDa" class="form-label"></label>
+                        <input asp-for="SoLuongToiDa" type="number" class="form-control" />
+                        <span asp-validation-for="SoLuongToiDa" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="GiaVeMacDinh" class="form-label"></label>
+                        <input asp-for="GiaVeMacDinh" type="number" step="1000" class="form-control" />
+                        <span asp-validation-for="GiaVeMacDinh" class="text-danger small"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ========== KHỐI ĐỊA ĐIỂM & LOẠI VÉ (TRỰC TIẾP) ========== -->
+            <div id="block-truc-tiep" style="display:none;">
+                <hr />
+                <h5 class="mb-3">Thông tin sự kiện trực tiếp</h5>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="TenDiaDiem" class="form-label"></label>
+                        <input asp-for="TenDiaDiem" class="form-control" />
+                        <span asp-validation-for="TenDiaDiem" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DiaChi" class="form-label"></label>
+                        <input asp-for="DiaChi" class="form-control" />
+                        <span asp-validation-for="DiaChi" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="SoChoNgoi" class="form-label"></label>
+                        <input asp-for="SoChoNgoi" type="number" class="form-control" />
+                        <span asp-validation-for="SoChoNgoi" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-8 mb-3">
+                        <label asp-for="BanDo" class="form-label"></label>
+                        <input asp-for="BanDo" class="form-control" placeholder="Link Google Maps (nếu có)" />
+                        <span asp-validation-for="BanDo" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- HÀNG CẤU HÌNH SƠ ĐỒ GHẾ A1, A2... & KHU VIP/THƯỜNG -->
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="SoHang" class="form-label"></label>
+                        <input asp-for="SoHang" type="number" class="form-control" />
+                        <span asp-validation-for="SoHang" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="SoCotMoiHang" class="form-label"></label>
+                        <input asp-for="SoCotMoiHang" type="number" class="form-control" />
+                        <span asp-validation-for="SoCotMoiHang" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="HangVipTu" class="form-label"></label>
+                        <input asp-for="HangVipTu" type="number" class="form-control" placeholder="VD: 1 (hàng A)" />
+                        <span asp-validation-for="HangVipTu" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="HangVipDen" class="form-label"></label>
+                        <input asp-for="HangVipDen" type="number" class="form-control" placeholder="VD: 2 (hàng B)" />
+                        <span asp-validation-for="HangVipDen" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <h6 class="mb-2 mt-2">Cấu hình loại vé</h6>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="TenLoaiVe1" class="form-label"></label>
+                        <input asp-for="TenLoaiVe1" class="form-control" placeholder="VD: VIP" />
+                        <span asp-validation-for="TenLoaiVe1" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="GiaVe1" class="form-label"></label>
+                        <input asp-for="GiaVe1" type="number" step="1000" class="form-control" />
+                        <span asp-validation-for="GiaVe1" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="SoLuongVe1" class="form-label"></label>
+                        <input asp-for="SoLuongVe1" type="number" class="form-control" />
+                        <span asp-validation-for="SoLuongVe1" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="TenLoaiVe2" class="form-label"></label>
+                        <input asp-for="TenLoaiVe2" class="form-control" placeholder="VD: Thường" />
+                        <span asp-validation-for="TenLoaiVe2" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="GiaVe2" class="form-label"></label>
+                        <input asp-for="GiaVe2" type="number" step="1000" class="form-control" />
+                        <span asp-validation-for="GiaVe2" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="SoLuongVe2" class="form-label"></label>
+                        <input asp-for="SoLuongVe2" type="number" class="form-control" />
+                        <span asp-validation-for="SoLuongVe2" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== KHỐI RIÊNG CHO WORKSHOP ========== -->
+            <div id="block-workshop" style="display:none;">
+                <hr />
+                <h5 class="mb-1">Thông tin workshop</h5>
+                <div class="small text-muted mb-3">Workshop dùng sơ đồ ghế chữ U cố định 30 ghế (5 hàng x 6 ghế).</div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="TenDiaDiem" class="form-label"></label>
+                        <input asp-for="TenDiaDiem" class="form-control" />
+                        <span asp-validation-for="TenDiaDiem" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DiaChi" class="form-label"></label>
+                        <input asp-for="DiaChi" class="form-control" />
+                        <span asp-validation-for="DiaChi" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="SoChoNgoi" class="form-label"></label>
+                        <input asp-for="SoChoNgoi" type="number" class="form-control" />
+                        <span asp-validation-for="SoChoNgoi" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="SoHang" class="form-label"></label>
+                        <input asp-for="SoHang" type="number" class="form-control" />
+                        <span asp-validation-for="SoHang" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="SoCotMoiHang" class="form-label"></label>
+                        <input asp-for="SoCotMoiHang" type="number" class="form-control" />
+                        <span asp-validation-for="SoCotMoiHang" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="HangVipTu" class="form-label"></label>
+                        <input asp-for="HangVipTu" type="number" class="form-control" />
+                        <span asp-validation-for="HangVipTu" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="HangVipDen" class="form-label"></label>
+                        <input asp-for="HangVipDen" type="number" class="form-control" />
+                        <span asp-validation-for="HangVipDen" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <h6 class="mb-2 mt-2">Cấu hình loại vé workshop</h6>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="TenLoaiVe1" class="form-label"></label>
+                        <input asp-for="TenLoaiVe1" class="form-control" placeholder="VD: VIP" />
+                        <span asp-validation-for="TenLoaiVe1" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="GiaVe1" class="form-label"></label>
+                        <input asp-for="GiaVe1" type="number" step="1000" class="form-control" />
+                        <span asp-validation-for="GiaVe1" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="SoLuongVe1" class="form-label"></label>
+                        <input asp-for="SoLuongVe1" type="number" class="form-control" />
+                        <span asp-validation-for="SoLuongVe1" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="TenLoaiVe2" class="form-label"></label>
+                        <input asp-for="TenLoaiVe2" class="form-control" placeholder="VD: Thường" />
+                        <span asp-validation-for="TenLoaiVe2" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="GiaVe2" class="form-label"></label>
+                        <input asp-for="GiaVe2" type="number" step="1000" class="form-control" />
+                        <span asp-validation-for="GiaVe2" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="SoLuongVe2" class="form-label"></label>
+                        <input asp-for="SoLuongVe2" type="number" class="form-control" />
+                        <span asp-validation-for="SoLuongVe2" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== KHỐI TRỰC TUYẾN ========== -->
+            <div id="block-truc-tuyen" style="display:none;">
+                <hr />
+                <h5 class="mb-3">Thông tin sự kiện trực tuyến</h5>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="NenTang" class="form-label"></label>
+                        <input asp-for="NenTang" class="form-control" placeholder="Zoom, Google Meet, YouTube..." />
+                        <span asp-validation-for="NenTang" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-8 mb-3">
+                        <label asp-for="LinkXem" class="form-label"></label>
+                        <input asp-for="LinkXem" class="form-control" />
+                        <span asp-validation-for="LinkXem" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="MatKhauPhong" class="form-label"></label>
+                        <input asp-for="MatKhauPhong" class="form-control" />
+                        <span asp-validation-for="MatKhauPhong" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-8 mb-3">
+                        <label asp-for="HuongDan" class="form-label"></label>
+                        <textarea asp-for="HuongDan" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="HuongDan" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                @* ⭐ CẤU HÌNH LOẠI VÉ TRỰC TUYẾN – CHỈ NHẬP TÊN HIỂN THỊ *@
+                <h6 class="mb-2 mt-2">Cấu hình loại vé trực tuyến</h6>
+
+                <div class="row">
+                    <div class="col-md-12 mb-2">
+                        <label class="form-label">Tên loại vé trực tuyến</label>
+                        <input type="text"
+                               id="TenLoaiVeOnline"
+                               class="form-control"
+                               placeholder="VD: Vé Online" />
+                        <div class="form-text">
+                            Giá vé và số lượng sẽ dùng từ <strong>Giá vé mặc định</strong> và <strong>Số lượng tối đa</strong> ở trên.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Gửi Admin duyệt
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+                Hủy
+            </a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Bỏ dấu tiếng Việt để so sánh
+        function removeVietnameseTone(str) {
+            if (!str) return "";
+            return str
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase();
+        }
+
+        // Đồng bộ TenLoaiVe1 / GiaVe1 / SoLuongVe1 cho sự kiện TRỰC TUYẾN
+        function syncOnlineLoaiVeFields() {
+            var select = document.getElementById("LoaiId");
+            if (!select) return;
+
+            var selectedOption = select.options[select.selectedIndex];
+            var textRaw = selectedOption ? selectedOption.text : "";
+            var text = removeVietnameseTone(textRaw);
+
+            var isOnline = text.includes("truc tuyen");
+
+            if (!isOnline) return;
+
+            var tenOnlineInput = document.getElementById("TenLoaiVeOnline");
+            var tenHidden = document.getElementById("TenLoaiVe1");
+            var giaMacDinh = document.getElementById("GiaVeMacDinh");
+            var giaHidden = document.getElementById("GiaVe1");
+            var soLuongToiDa = document.getElementById("SoLuongToiDa");
+            var soLuongHidden = document.getElementById("SoLuongVe1");
+
+            if (tenOnlineInput && tenHidden) {
+                tenHidden.value = tenOnlineInput.value || "Vé Online";
+            }
+            if (giaMacDinh && giaHidden) {
+                giaHidden.value = giaMacDinh.value;
+            }
+            if (soLuongToiDa && soLuongHidden) {
+                soLuongHidden.value = soLuongToiDa.value;
+            }
+        }
+
+        function capNhatBlockTheoLoai() {
+            var select = document.getElementById("LoaiId");
+            if (!select) return;
+
+            var selectedOption = select.options[select.selectedIndex];
+            var textRaw = selectedOption ? selectedOption.text : "";
+            var text = removeVietnameseTone(textRaw);
+
+            var blockTrucTiep = document.getElementById("block-truc-tiep");
+            var blockWorkshop = document.getElementById("block-workshop");
+            var blockTrucTuyen = document.getElementById("block-truc-tuyen");
+
+            function setBlockEnabled(block, enabled) {
+                if (!block) return;
+                var fields = block.querySelectorAll("input, select, textarea");
+                fields.forEach(function (f) { f.disabled = !enabled; });
+            }
+
+            function applyWorkshopSeatPreset(enabled) {
+                // Có 2 block cùng dùng asp-for nên phải set cho toàn bộ phần tử cùng name
+                var soChoNgoiFields = document.querySelectorAll('input[name="SoChoNgoi"]');
+                var soHangFields = document.querySelectorAll('input[name="SoHang"]');
+                var soCotFields = document.querySelectorAll('input[name="SoCotMoiHang"]');
+
+                soChoNgoiFields.forEach(function (f) {
+                    if (enabled) { f.value = 30; f.readOnly = true; }
+                    else { f.readOnly = false; }
+                });
+                soHangFields.forEach(function (f) {
+                    if (enabled) { f.value = 5; f.readOnly = true; }
+                    else { f.readOnly = false; }
+                });
+                soCotFields.forEach(function (f) {
+                    if (enabled) { f.value = 6; f.readOnly = true; }
+                    else { f.readOnly = false; }
+                });
+            }
+
+            blockTrucTiep.style.display = "none";
+            blockWorkshop.style.display = "none";
+            blockTrucTuyen.style.display = "none";
+            setBlockEnabled(blockTrucTiep, false);
+            setBlockEnabled(blockWorkshop, false);
+            setBlockEnabled(blockTrucTuyen, false);
+
+            var isWorkshop = text.includes("workshop");
+
+            applyWorkshopSeatPreset(isWorkshop);
+
+            if (text.includes("truc tiep") && !isWorkshop) {
+                blockTrucTiep.style.display = "block";
+                setBlockEnabled(blockTrucTiep, true);
+            } else if (isWorkshop) {
+                blockWorkshop.style.display = "block";
+                setBlockEnabled(blockWorkshop, true);
+            } else if (text.includes("truc tuyen")) {
+                blockTrucTuyen.style.display = "block";
+                setBlockEnabled(blockTrucTuyen, true);
+                // khi là trực tuyến thì đồng bộ dữ liệu loại vé
+                syncOnlineLoaiVeFields();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var selectLoai = document.getElementById("LoaiId");
+            if (selectLoai) {
+                selectLoai.addEventListener("change", function () {
+                    capNhatBlockTheoLoai();
+                    syncOnlineLoaiVeFields();
+                });
+            }
+
+            var tenLoaiVeOnline = document.getElementById("TenLoaiVeOnline");
+            if (tenLoaiVeOnline) {
+                tenLoaiVeOnline.addEventListener("input", syncOnlineLoaiVeFields);
+            }
+
+            var giaMacDinh = document.getElementById("GiaVeMacDinh");
+            if (giaMacDinh) {
+                giaMacDinh.addEventListener("input", syncOnlineLoaiVeFields);
+            }
+
+            var soLuongToiDa = document.getElementById("SoLuongToiDa");
+            if (soLuongToiDa) {
+                soLuongToiDa.addEventListener("input", syncOnlineLoaiVeFields);
+            }
+
+            // Khởi tạo lần đầu
+            capNhatBlockTheoLoai();
+            syncOnlineLoaiVeFields();
+        });
+    </script>
+}

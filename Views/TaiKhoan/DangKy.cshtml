@@ -1,0 +1,60 @@
+@model VeSuKienWeb.Models.TaiKhoan.DangKyYeuCau
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-3">Tạo tài khoản</h3>
+                <p class="text-muted text-center mb-4">
+                    Đăng ký để nhận vé tham gia các sự kiện hấp dẫn.
+                </p>
+
+                <form asp-action="DangKy" method="post">
+                    <div class="mb-3">
+                        <label asp-for="HoTen" class="form-label">Họ tên</label>
+                        <input asp-for="HoTen" class="form-control" />
+                        <span asp-validation-for="HoTen" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DienThoai" class="form-label">Số điện thoại</label>
+                        <input asp-for="DienThoai" class="form-control" />
+                        <span asp-validation-for="DienThoai" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="MatKhau" class="form-label">Mật khẩu</label>
+                        <input asp-for="MatKhau" type="password" class="form-control" />
+                        <span asp-validation-for="MatKhau" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="XacNhanMatKhau" class="form-label">Xác nhận mật khẩu</label>
+                        <input asp-for="XacNhanMatKhau" type="password" class="form-control" />
+                        <span asp-validation-for="XacNhanMatKhau" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        Đăng ký
+                    </button>
+                </form>
+
+                <hr class="my-4" />
+
+                <div class="text-center">
+                    <span class="text-muted">Đã có tài khoản?</span>
+                    <a asp-controller="TaiKhoan" asp-action="DangNhap">Đăng nhập</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

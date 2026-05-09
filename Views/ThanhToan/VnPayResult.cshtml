@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Kết quả thanh toán VNPAY";
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h4 class="card-title mb-3">Kết quả thanh toán</h4>
+
+        <p class="mb-2">
+            @ViewBag.Message
+        </p>
+
+        @if (ViewBag.DonHangId != null)
+        {
+            <p class="mb-1">Mã đơn hàng: <strong>@ViewBag.DonHangId</strong></p>
+        }
+
+        @if (ViewBag.TransactionNo != null)
+        {
+            <p class="mb-1">Mã giao dịch VNPAY: <strong>@ViewBag.TransactionNo</strong></p>
+        }
+
+        @if (ViewBag.ResponseCode != null)
+        {
+            <p class="mb-3">ResponseCode: <strong>@ViewBag.ResponseCode</strong></p>
+        }
+
+        <a asp-controller="KhachHang" asp-action="Index" class="btn btn-primary">
+            Quay lại danh sách sự kiện
+        </a>
+    </div>
+</div>
+

@@ -1,0 +1,68 @@
+
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<dynamic> HtmlHelper
+@{
+    Layout = "_Layout"; // nếu bạn muốn kế thừa layout tổng, hoặc bỏ dòng này nếu không cần
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- SIDEBAR BÊN TRÁI -->
+        <nav class="col-12 col-md-3 col-lg-2 bg-light border-end min-vh-100 p-0">
+            <div class="d-flex flex-column h-100">
+                <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Ban tổ chức</h5>
+                    <div class="text-muted small">Quản lý sự kiện & vé</div>
+                </div>
+
+                <div class="nav flex-column nav-pills p-2 gap-1">
+                    <a asp-controller="BanToChuc" asp-action="Index"
+                       class="nav-link @(currentAction == "Index" ? "active" : "")">
+                        <i class="bi bi-calendar-event"></i>
+                        <span class="ms-1">Sự kiện của tôi</span>
+                    </a>
+
+                    <a asp-controller="BanToChuc" asp-action="TaoSuKien"
+                       class="nav-link @(currentAction == "TaoSuKien" ? "active" : "")">
+                        <i class="bi bi-plus-circle"></i>
+                        <span class="ms-1">Tạo sự kiện mới</span>
+                    </a>
+
+                    <a asp-controller="BanToChuc" asp-action="YeuCauHoanHuy"
+                       class="nav-link @(currentAction == "YeuCauHoanHuy" ? "active" : "")">
+                        <i class="bi bi-arrow-repeat"></i>
+                        <span class="ms-1">Yêu cầu hoàn/hủy vé</span>
+                    </a>
+
+
+
+
+                    @* Sau này nếu muốn có trang thống kê tổng *@
+<a asp-controller="BanToChuc" asp-action="ThongKeTongQuan"
+   class="nav-link @(currentAction == "ThongKeTongQuan" ? "active" : "")">
+    <i class="bi bi-bar-chart"></i>
+    <span class="ms-1">Thống kê tổng quan</span>
+</a>
+
+
+
+
+
+
+                </div>
+
+                <div class="mt-auto p-3 border-top small text-muted">
+                    © Hệ thống đặt vé sự kiện
+                </div>
+            </div>
+        </nav>
+
+        <!-- NỘI DUNG CHÍNH BÊN PHẢI -->
+        <main class="col-12 col-md-9 col-lg-10 p-3">
+            @RenderBody()
+        </main>
+    </div>
+</div>
+@RenderSection("Scripts", required: false)

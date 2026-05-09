@@ -1,0 +1,113 @@
+
+@model List<VeSuKienWeb.Models.BanToChuc.YeuCauHoanHuyItemBtcVM>
+
+@{
+    Layout = "~/Views/Shared/_LayoutBanToChuc.cshtml";
+    ViewData["Title"] = "Yêu cầu hoàn/hủy vé";
+
+    string? trangThai = ViewBag.TrangThai as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">Yêu cầu hoàn/hủy vé</h2>
+        <div class="text-muted small">
+            Xem và xử lý các yêu cầu hoàn/hủy vé từ khách hàng.
+        </div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        &laquo; Quay lại sự kiện của tôi
+    </a>
+</div>
+
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-success">@TempData["ThongBao"]</div>
+}
+
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">Trạng thái yêu cầu</label>
+                <select name="trangThai" class="form-select form-select-sm">
+                    <option value="">Tất cả</option>
+                    <option value="ChoDuyet" selected="@(trangThai == "ChoDuyet")">Chờ duyệt</option>
+                    <option value="DaDuyet" selected="@(trangThai == "DaDuyet")">Đã duyệt</option>
+                    <option value="TuChoi" selected="@(trangThai == "TuChoi")">Từ chối</option>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-outline-primary btn-sm mt-auto">Lọc</button>
+                <a asp-action="YeuCauHoanHuy" class="btn btn-outline-secondary btn-sm mt-auto">Xóa lọc</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Mã vé</th>
+                            <th>Sự kiện</th>
+                            <th>Khách hàng</th>
+                            <th>Hình thức</th>
+                            <th>Lý do</th>
+                            <th>Ngày yêu cầu</th>
+                            <th>Trạng thái</th>
+                            <th style="width: 140px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.MaVe</td>
+                                <td>@item.TenSuKien</td>
+                                <td>@item.HoTenKhach</td>
+                                <td>@item.HinhThuc</td>
+                                <td>@item.LyDo</td>
+                                <td>@item.NgayYeuCau.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@item.TrangThai</td>
+                                <td>
+                                    @if (item.TrangThai == "ChoDuyet")
+                                    {
+                                        <div class="d-flex gap-1">
+                                            <form asp-action="DuyetYeuCauHoanHuy" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.YeuCauId" />
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    Duyệt
+                                                </button>
+                                            </form>
+                                            <form asp-action="TuChoiYeuCauHoanHuy" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.YeuCauId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    Từ chối
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Đã xử lý</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted mb-0"><em>Hiện chưa có yêu cầu nào.</em></p>
+        }
+    </div>
+</div>

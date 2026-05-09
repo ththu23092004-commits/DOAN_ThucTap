@@ -1,0 +1,62 @@
+@model List<VeSuKienWeb.Models.BanToChuc.DanhSachVeSuKienItemVM>
+
+@{
+    Layout = "~/Views/Shared/_LayoutBanToChuc.cshtml";
+    ViewData["Title"] = "Danh sách vé";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">Danh sách vé theo sự kiện</h2>
+        <div class="text-muted small">Chọn sự kiện để xem danh sách người đặt vé và trạng thái vé.</div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Sự kiện</th>
+                            <th style="width:240px">Thời gian</th>
+                            <th class="text-end" style="width:120px">Tổng vé</th>
+                            <th class="text-end" style="width:160px">Đã thanh toán</th>
+                            <th class="text-end" style="width:120px">Đã hủy</th>
+                            <th style="width:140px" class="text-end">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sk in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@sk.TenSuKien</td>
+                                <td class="text-muted small">
+                                    @sk.ThoiGianBatDau.ToString("dd/MM/yyyy HH:mm")
+                                    <span class="mx-1">-</span>
+                                    @sk.ThoiGianKetThuc.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                                <td class="text-end">@sk.TongVe</td>
+                                <td class="text-end">@sk.VeDaThanhToan</td>
+                                <td class="text-end">@sk.VeDaHuy</td>
+                                <td class="text-end">
+                                    <a asp-action="DanhSachVe" asp-route-id="@sk.SuKienId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Xem vé
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-muted"><em>Chưa có sự kiện nào để thống kê vé.</em></div>
+        }
+    </div>
+</div>
+

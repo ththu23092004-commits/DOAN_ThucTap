@@ -1,0 +1,111 @@
+@model IEnumerable<VeSuKienWeb.Models.Admin.YeuCauHoanHuyAdminVM>
+
+@{
+    ViewData["Title"] = "Yêu cầu hủy/hoàn vé";
+}
+
+<h2 class="mb-3">Yêu cầu hủy/hoàn vé</h2>
+
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-info">
+        @TempData["ThongBao"]
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-secondary">
+        Hiện không có yêu cầu hủy/hoàn vé nào.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã vé</th>
+                    <th>Sự kiện</th>
+                    <th>Khách hàng</th>
+                    <th>Số tiền</th>
+                    <th>Ngày yêu cầu</th>
+                    <th>Hình thức</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                // Badge màu
+                var badgeClass = item.TrangThai switch
+                {
+                    "ChoDuyet" => "badge bg-warning text-dark",
+                    "DaDuyet"  => "badge bg-success",
+                    "TuChoi"   => "badge bg-secondary",
+                    _          => "badge bg-light text-dark"
+                };
+
+                // Map tiếng Việt có dấu cho trạng thái
+                var trangThaiTiengViet = item.TrangThai switch
+                {
+                    "ChoDuyet" => "Chờ duyệt",
+                    "DaDuyet"  => "Đã duyệt",
+                    "TuChoi"   => "Từ chối",
+                    _ => item.TrangThai
+                };
+
+                // Map tiếng Việt có dấu cho hình thức
+                var hinhThucTiengViet = item.HinhThuc switch
+                {
+                    "HoanTien" => "Hoàn tiền",
+                    "HuyVe" => "Hủy vé",
+                    _ => item.HinhThuc
+                };
+
+                <tr>
+                    <td>@item.MaVe</td>
+                    <td>
+                        <div>@item.TenSuKien</div>
+                        <div class="small text-muted">@item.LyDo</div>
+                    </td>
+                    <td>
+                        <div>@item.TenNguoiDung</div>
+                        <div class="small text-muted">@item.EmailNguoiDung</div>
+                    </td>
+                    <td>@item.SoTien.ToString("N0") đ</td>
+                    <td>@item.NgayYeuCau.ToString("dd/MM/yyyy HH:mm")</td>
+
+                    <td>@hinhThucTiengViet</td>
+
+                    <td>
+                        <span class="@badgeClass">@trangThaiTiengViet</span>
+                    </td>
+
+                    <td class="text-end">
+                        @if (item.TrangThai == "ChoDuyet")
+                        {
+                            <form asp-action="DuyetYeuCauHoanHuy" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.YeuCauId" />
+                                <button type="submit" class="btn btn-sm btn-success me-1">Duyệt</button>
+                            </form>
+
+                            <form asp-action="TuChoiYeuCauHoanHuy" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.YeuCauId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Từ chối</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">Đã xử lý</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

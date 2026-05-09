@@ -1,0 +1,204 @@
+@model List<VeSuKienWeb.Models.SuKien>
+
+@{
+    Layout = "~/Views/Shared/_LayoutBanToChuc.cshtml";
+    ViewData["Title"] = "Sự kiện của tôi";
+
+    string? trangThaiDuyet = ViewBag.TrangThaiDuyet as string;
+    string? thoiGian = ViewBag.ThoiGian as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">Sự kiện của tôi</h2>
+        <div class="text-muted small">
+            Quản lý các sự kiện bạn đã tạo và trạng thái duyệt từ Admin.
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a asp-action="YeuCauHoanHuy" class="btn btn-outline-secondary">
+            Yêu cầu hoàn/hủy vé
+        </a>
+
+        <a asp-action="TaoSuKien" class="btn btn-primary">
+            + Tạo sự kiện mới
+        </a>
+    </div>
+</div>
+
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-success">@TempData["ThongBao"]</div>
+}
+
+<!-- BỘ LỌC -->
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Trạng thái duyệt</label>
+                <select name="trangThaiDuyet" class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="ChoDuyet" selected="@(trangThaiDuyet == "ChoDuyet")">Chờ duyệt</option>
+                    <option value="DaDuyet" selected="@(trangThaiDuyet == "DaDuyet")">Đã duyệt</option>
+                    <option value="TuChoi" selected="@(trangThaiDuyet == "TuChoi")">Từ chối</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Thời gian</label>
+                <select name="thoiGian" class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="SapDienRa" selected="@(thoiGian == "SapDienRa")">Sắp diễn ra</option>
+                    <option value="DaDienRa" selected="@(thoiGian == "DaDienRa")">Đã diễn ra</option>
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-outline-primary mt-auto">Lọc</button>
+                <a asp-action="Index" class="btn btn-outline-secondary mt-auto">Xóa lọc</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @foreach (var sk in Model)
+        {
+            var thoiGianStr = $"{sk.ThoiGianBatDau:HH:mm dd/MM/yyyy} - {sk.ThoiGianKetThuc:HH:mm}";
+            string trangThaiClass;
+            string trangThaiText;
+
+            switch (sk.TrangThaiDuyet)
+            {
+                case "DaDuyet":
+                    trangThaiClass = "bg-success";
+                    trangThaiText = "Đã duyệt";
+                    break;
+                case "TuChoi":
+                    trangThaiClass = "bg-danger";
+                    trangThaiText = "Từ chối";
+                    break;
+                case "An":
+                    trangThaiClass = "bg-secondary";
+                    trangThaiText = "Đã ẩn";
+                    break;
+                default:
+                    trangThaiClass = "bg-warning text-dark";
+                    trangThaiText = "Chờ duyệt";
+                    break;
+            }
+
+            bool daDienRa = sk.ThoiGianKetThuc < DateTime.Now;
+
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column">
+
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="card-title mb-0">@sk.TenSuKien</h5>
+
+                                @if (sk.LoaiSuKien != null)
+                                {
+                                    <span class="badge bg-light text-dark border mt-1">
+                                        @sk.LoaiSuKien.TenLoai
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="text-end">
+                                <span class="badge @trangThaiClass">@trangThaiText</span>
+                                <div class="small text-muted mt-1">
+                                    @(daDienRa ? "Đã diễn ra" : "Sắp diễn ra")
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-muted small mb-1">
+                            <i class="bi bi-clock"></i> @thoiGianStr
+                        </p>
+
+                        <p class="card-text small flex-grow-1">
+                            @{
+                                var moTa = sk.MoTaChiTiet ?? "";
+                            }
+                            @(moTa.Length > 120 ? moTa.Substring(0, 120) + "..." : moTa)
+                        </p>
+
+                        @if (sk.GiaVeMacDinh.HasValue)
+                        {
+                            <p class="fw-semibold mb-2">
+                                Giá vé mặc định: @sk.GiaVeMacDinh.Value.ToString("N0") đ
+                            </p>
+                        }
+
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">
+                                Đăng ngày @sk.NgayDang.ToString("dd/MM/yyyy")
+                            </span>
+
+                            <div class="text-end">
+
+                                <a asp-action="ChiTiet"
+                                   asp-route-id="@sk.SuKienId"
+                                   class="btn btn-outline-primary btn-sm mb-1">
+                                    Xem chi tiết & thống kê
+                                </a>
+
+                                <!-- BUTTON GROUP: QUẢN LÝ -->
+                                @if (sk.TrangThaiDuyet == "DaDuyet")
+                                {
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="QuanLyVe"
+                                           asp-route-id="@sk.SuKienId"
+                                           class="btn btn-outline-secondary">
+                                            Quản lý vé
+                                        </a>
+
+                                        <a asp-action="DanhSachVe"
+                                           asp-route-id="@sk.SuKienId"
+                                           class="btn btn-outline-secondary">
+                                            DS vé / tham gia
+                                        </a>
+
+                                        <a asp-action="GuiThongBao"
+                                           asp-route-id="@sk.SuKienId"
+                                           class="btn btn-outline-secondary">
+                                            Thông báo
+                                        </a>
+                                    </div>
+                                }
+
+                                <!-- NÚT XÓA / ẨN SỰ KIỆN -->
+                                <form asp-action="XoaSuKien"
+                                      asp-route-id="@sk.SuKienId"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Bạn có chắc muốn xóa/ẩn sự kiện này không?');">
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm mt-1">
+                                        Xóa / Ẩn
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-light border">
+        <div class="fw-semibold">Bạn chưa có sự kiện nào.</div>
+        <div class="small text-muted">Hãy tạo sự kiện đầu tiên để gửi Admin duyệt.</div>
+    </div>
+}

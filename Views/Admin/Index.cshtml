@@ -1,0 +1,118 @@
+@model List<VeSuKienWeb.Models.SuKien>
+@{
+    ViewData["Title"] = "Duyệt sự kiện";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">Duyệt sự kiện</h2>
+        <div class="text-muted small">
+            Admin xem danh sách sự kiện do các Ban tổ chức gửi lên và phê duyệt.
+        </div>
+    </div>
+</div>
+
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-success">@TempData["ThongBao"]</div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên sự kiện</th>
+                        <th>Thời gian</th>
+                        <th>Loại</th>
+                        <th>Tổ chức</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var sk in Model)
+                {
+                    var thoiGian = $"{sk.ThoiGianBatDau:HH:mm dd/MM/yyyy} - {sk.ThoiGianKetThuc:HH:mm}";
+                    string trangThaiClass;
+                    string trangThaiText;
+
+                    switch (sk.TrangThaiDuyet)
+                    {
+                        case "DaDuyet":
+                            trangThaiClass = "bg-success";
+                            trangThaiText = "Đã duyệt";
+                            break;
+                        case "TuChoi":
+                            trangThaiClass = "bg-danger";
+                            trangThaiText = "Từ chối";
+                            break;
+                        default:
+                            trangThaiClass = "bg-warning text-dark";
+                            trangThaiText = "Chờ duyệt";
+                            break;
+                    }
+
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">@sk.TenSuKien</div>
+                            <div class="small text-muted">
+                                Đăng ngày @sk.NgayDang.ToString("dd/MM/yyyy")
+                            </div>
+                        </td>
+                        <td class="small">@thoiGian</td>
+                        <td class="small">
+                            @sk.LoaiSuKien?.TenLoai
+                        </td>
+                        <td class="small">
+                            @sk.ToChucSuKien?.TenToChuc
+                        </td>
+                        <td>
+                            <span class="badge @trangThaiClass">@trangThaiText</span>
+                        </td>
+                        <td class="text-end">
+                            <!-- NÚT XEM CHI TIẾT MỚI THÊM -->
+                            <a asp-action="ChiTiet"
+                               asp-route-id="@sk.SuKienId"
+                               class="btn btn-outline-primary btn-sm me-1">
+                                Chi tiết
+                            </a>
+
+                            @if (sk.TrangThaiDuyet == "ChoDuyet")
+                            {
+                                <form asp-action="Duyet" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@sk.SuKienId" />
+                                    <button class="btn btn-success btn-sm" type="submit">
+                                        Duyệt
+                                    </button>
+                                </form>
+                                <form asp-action="TuChoi" method="post" class="d-inline ms-1">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@sk.SuKienId" />
+                                    <button class="btn btn-outline-danger btn-sm" type="submit">
+                                        Từ chối
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Đã xử lý</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-light border">
+        <div class="fw-semibold">Chưa có sự kiện nào.</div>
+        <div class="small text-muted">Khi Ban tổ chức gửi sự kiện, bạn sẽ thấy tại đây để duyệt.</div>
+    </div>
+}

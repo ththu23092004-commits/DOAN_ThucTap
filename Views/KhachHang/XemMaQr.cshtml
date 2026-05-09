@@ -1,0 +1,32 @@
+@model VeSuKienWeb.Models.KhachHang.MaQrVM
+
+@{
+    ViewData["Title"] = "Mã QR vé";
+}
+
+<h2 class="mb-4 text-center">Mã QR vé</h2>
+
+<div class="d-flex justify-content-center">
+    <div class="card shadow-sm text-center p-4" style="max-width: 350px; width: 100%;">
+
+        <p class="mb-3">Quét mã QR này khi check-in sự kiện:</p>
+
+        <img src="data:image/png;base64,@Model.QrCodeBase64"
+             alt="QR Code"
+             class="img-fluid mb-3 mx-auto d-block"
+             style="max-width: 250px;" />
+
+        <p class="mb-1">
+            <strong>Mã vé:</strong> @Model.MaVe
+        </p>
+
+        <p class="text-muted small">
+            QR chứa thông tin: CHECKIN | @Model.VeId | @Model.MaVe
+        </p>
+
+        <a asp-action="VeCuaToi" class="btn btn-secondary btn-sm mt-3 w-100">
+            Quay lại danh sách vé
+        </a>
+
+    </div>
+</div>

@@ -1,0 +1,48 @@
+
+@model VeSuKienWeb.Models.BanToChuc.GuiThongBaoBtcVM
+
+@{
+    Layout = "~/Views/Shared/_LayoutBanToChuc.cshtml";
+    ViewData["Title"] = "Gửi thông báo";
+
+    var tenSuKien = ViewBag.TenSuKien as string ?? "Sự kiện";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">Gửi thông báo</h2>
+        <div class="text-muted small">
+            Sự kiện: <strong>@tenSuKien</strong>
+        </div>
+    </div>
+    <a asp-action="ChiTiet" asp-route-id="@Model.SuKienId" class="btn btn-outline-secondary">
+        &laquo; Quay lại chi tiết sự kiện
+    </a>
+</div>
+
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-success">@TempData["ThongBao"]</div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="GuiThongBao" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="SuKienId" />
+
+            <div class="mb-3">
+                <label class="form-label">Nội dung thông báo</label>
+                <textarea asp-for="NoiDung"
+                          rows="5"
+                          class="form-control"
+                          placeholder="VD: Sự kiện thay đổi giờ bắt đầu, vui lòng kiểm tra lại thông tin..."></textarea>
+                <span asp-validation-for="NoiDung" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Gửi thông báo tới người đã đặt vé
+            </button>
+        </form>
+    </div>
+</div>

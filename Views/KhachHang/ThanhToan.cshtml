@@ -1,0 +1,106 @@
+@model VeSuKienWeb.Models.KhachHang.ThanhToanKhVM
+
+@{
+    ViewData["Title"] = "Thanh toán đơn hàng";
+}
+
+<h2 class="mb-3">Thanh toán đơn hàng #@Model.DonHangId</h2>
+
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-info">@TempData["ThongBao"]</div>
+}
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-light">
+                <strong>Chi tiết vé</strong>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Mã vé</th>
+                            <th>Sự kiện</th>
+                            <th>Loại vé</th>
+                            <th>Ghế</th>
+                            <th class="text-end">Giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model.Ves)
+                        {
+                            <tr>
+                                <td>@v.MaVe</td>
+                                <td>@v.TenSuKien</td>
+                                <td>@v.TenLoaiVe</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(v.Hang))
+                                    {
+                                        <text>@v.Hang@v.Cot</text>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Không áp dụng</span>
+                                    }
+                                </td>
+                                <td class="text-end">@v.GiaVe.ToString("N0") đ</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td colspan="4" class="text-end fw-semibold">
+                                Tổng cộng
+                            </td>
+                            <td class="text-end fw-bold">
+                                @Model.TongTien.ToString("N0") đ
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-light">
+                <strong>Chọn hình thức thanh toán</strong>
+            </div>
+            <div class="card-body text-center">
+                <p class="mb-2">Bạn có thể thanh toán qua VNPAY hoặc QR demo.</p>
+
+                <a asp-controller="ThanhToan"
+                   asp-action="VnPay"
+                   asp-route-donHangId="@Model.DonHangId"
+                   class="btn btn-primary w-100 mb-3">
+                    Thanh toán qua VNPAY
+                </a>
+
+                <div class="text-muted small mb-2">Hoặc dùng luồng demo QR:</div>
+
+<div class="d-flex justify-content-center mb-3">
+    <div class="border rounded p-3 d-inline-block">
+        <img src="~/qr/maQR.jpg"
+             alt="QR thanh toán"
+             class="img-fluid"
+             style="width:220px;height:220px;object-fit:cover;" />
+    </div>
+</div>
+
+
+
+
+                <!-- Luồng QR demo cũ -->
+                <form asp-action="ThanhToanXacNhan" method="post" class="mt-2">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.DonHangId" />
+                    <button type="submit" class="btn btn-outline-success w-100">
+                        Xác nhận thanh toán QR demo
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+@model IEnumerable<VeSuKienWeb.Models.BanToChuc.ThongKeDoanhThuItemVM>
+
+@{
+    Layout = "~/Views/Shared/_LayoutBanToChuc.cshtml";
+    ViewData["Title"] = "Thống kê tổng quan";
+}
+
+<h2 class="mb-3">Thống kê doanh thu sự kiện</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-secondary">
+        Bạn chưa có sự kiện nào đã được duyệt hoặc chưa có dữ liệu vé.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Sự kiện</th>
+                    <th>Thời gian</th>
+                    <th class="text-center">Tổng vé</th>
+                    <th class="text-center">Đã thanh toán</th>
+                    <th class="text-center">Đã hủy</th>
+                    <th class="text-end">Doanh thu thực tế</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <div>@item.TenSuKien</div>
+                    </td>
+                    <td>
+                        <div>@item.ThoiGianBatDau.ToString("HH:mm dd/MM/yyyy")</div>
+                        <div class="small text-muted">
+                            đến @item.ThoiGianKetThuc.ToString("HH:mm dd/MM/yyyy")
+                        </div>
+                    </td>
+                    <td class="text-center">@item.TongSoVe</td>
+                    <td class="text-center text-success fw-semibold">@item.VeDaThanhToan</td>
+                    <td class="text-center text-danger">@item.VeDaHuy</td>
+                    <td class="text-end fw-semibold">
+                        @item.DoanhThuThucTe.ToString("N0") đ
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+

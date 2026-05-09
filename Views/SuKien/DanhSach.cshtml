@@ -1,0 +1,93 @@
+@model List<VeSuKienWeb.Models.SuKien>
+@{
+    ViewData["Title"] = "Danh sách sự kiện";
+
+    // ✅ Chỉ Admin + Ban tổ chức
+    bool laQuanTri = User.IsInRole("Admin") || User.IsInRole("ToChuc");
+}
+
+<h2 class="mb-3">Danh sách sự kiện</h2>
+<p class="text-muted">
+    Các sự kiện đã được Admin duyệt và đang mở cho người dùng đặt vé.
+</p>
+
+@if (Model != null && Model.Any())
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @foreach (var sk in Model)
+        {
+            var thoiGian = $"{sk.ThoiGianBatDau:HH:mm dd/MM/yyyy} - {sk.ThoiGianKetThuc:HH:mm}";
+
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+
+                    @* ⭐ THÊM PHẦN HÌNH ẢNH SỰ KIỆN Ở ĐÂY *@
+                    <img class="card-img-top"
+                         src="@Url.Content(sk.AnhSuKien ?? "~/images/default-event.jpg")"
+                         alt="@sk.TenSuKien"
+                         style="height: 180px; object-fit: cover;" />
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">@sk.TenSuKien</h5>
+
+                        <p class="text-muted small mb-1">
+                            <i class="bi bi-clock"></i>
+                            @thoiGian
+                        </p>
+
+                        @if (sk.LoaiSuKien != null)
+                        {
+                            <p class="small mb-2">
+                                <span class="badge bg-light text-dark border">
+                                    @sk.LoaiSuKien.TenLoai
+                                </span>
+                            </p>
+                        }
+
+                        <p class="card-text small flex-grow-1">
+                            @{
+                                var moTa = sk.MoTaChiTiet ?? "";
+                            }
+                            @(moTa.Length > 120 ? moTa.Substring(0, 120) + "..." : moTa)
+                        </p>
+
+                        @if (sk.GiaVeMacDinh.HasValue)
+                        {
+                            <p class="fw-semibold mb-3">
+                                Từ @sk.GiaVeMacDinh.Value.ToString("N0") đ
+                            </p>
+                        }
+
+                        @* 🔒 Thông báo riêng cho Admin / Ban tổ chức về sự kiện trực tuyến *@
+                        @if (laQuanTri 
+                             && sk.LoaiSuKien != null 
+                             && (sk.LoaiSuKien.TenLoai.Contains("trực tuyến", System.StringComparison.CurrentCultureIgnoreCase)
+                                 || sk.LoaiSuKien.TenLoai.Contains("online", System.StringComparison.CurrentCultureIgnoreCase)
+                                 || sk.LoaiSuKien.TenLoai.Contains("truc tuyen", System.StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            <div class="mt-2 small text-muted">
+                                <span class="badge bg-warning text-dark mb-1">
+                                    Sự kiện trực tuyến (chi tiết link xem tại trang Chi tiết)
+                                </span>
+                            </div>
+                        }
+
+                        <a asp-controller="SuKien"
+                           asp-action="ChiTiet"
+                           asp-route-id="@sk.SuKienId"
+                           class="btn btn-outline-primary mt-auto">
+                            Xem chi tiết & đặt vé
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-light border">
+        <div class="fw-semibold">Hiện chưa có sự kiện nào được duyệt.</div>
+        <div class="small text-muted">Vui lòng quay lại sau.</div>
+    </div>
+}

@@ -1,0 +1,93 @@
+@model VeSuKienWeb.Models.KhachHang.VeCuaToiItemVM
+
+@{
+    ViewData["Title"] = "Chi tiết vé";
+
+    // Map trạng thái sang tiếng Việt có dấu
+    string trangThai = Model.TrangThaiVe switch
+    {
+        "DaThanhToan" => "Đã thanh toán",
+        "ChuaThanhToan" => "Chưa thanh toán",
+        "DaHuy" => "Đã hủy",
+        "Huy"           => "Hủy", 
+        "HoanTien" => "Đã hoàn tiền",
+        _ => Model.TrangThaiVe
+    };
+}
+
+<h2 class="mb-3">Chi tiết vé</h2>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <span class="badge bg-primary">Mã vé: @Model.MaVe</span>
+        </div>
+        <small class="text-muted">
+            Ngày đặt: @Model.NgayDat.ToString("dd/MM/yyyy HH:mm")
+        </small>
+    </div>
+
+    <div class="card-body">
+        <h4 class="card-title">@Model.TenSuKien</h4>
+        <p class="text-muted mb-2">@Model.TenLoaiSuKien</p>
+
+        <p class="mb-1">
+            <strong>Thời gian:</strong><br />
+            @Model.ThoiGianBatDau.ToString("HH:mm dd/MM/yyyy")
+            -
+            @Model.ThoiGianKetThuc.ToString("HH:mm dd/MM/yyyy")
+        </p>
+
+        @if (Model.LaTrucTiep)
+        {
+            <p class="mb-1">
+                <strong>Địa điểm:</strong><br />
+                @Model.DiaDiem<br />
+                <span class="text-muted">@Model.DiaChi</span>
+            </p>
+        }
+        else if (Model.LaTrucTuyen)
+        {
+            <p class="mb-1">
+                <strong>Sự kiện trực tuyến trên:</strong> @Model.OnlineNenTang<br />
+                @if (!string.IsNullOrEmpty(Model.OnlineLinkXem))
+                {
+                    <span>Link: </span>
+                    <a href="@Model.OnlineLinkXem" target="_blank">@Model.OnlineLinkXem</a>
+                }
+
+                @* ⭐ MẬT KHẨU PHÒNG – chỉ hiện khi đã thanh toán và có mật khẩu *@
+                @if (Model.TrangThaiVe == "DaThanhToan" && !string.IsNullOrEmpty(Model.OnlineMatKhau))
+                {
+                    <br />
+                    <strong>Mật khẩu phòng:</strong> <code>@Model.OnlineMatKhau</code>
+                }
+            </p>
+        }
+
+        <hr />
+
+        <p class="mb-1"><strong>Loại vé:</strong> @Model.TenLoaiVe</p>
+        <p class="mb-1"><strong>Giá:</strong> @Model.GiaVe.ToString("N0") đ</p>
+
+        <p class="mb-1">
+            <strong>Trạng thái vé:</strong>
+            <span class="fw-bold">@trangThai</span>
+        </p>
+
+    </div>
+
+    <div class="card-footer d-flex justify-content-between">
+        <a asp-action="VeCuaToi" class="btn btn-secondary btn-sm">
+            Quay lại danh sách vé
+        </a>
+
+        <div>
+            <a asp-action="XemMaQr"
+               asp-route-veId="@Model.VeId"
+               class="btn btn-outline-secondary btn-sm">
+                Xem mã QR
+            </a>
+        </div>
+    </div>
+</div>

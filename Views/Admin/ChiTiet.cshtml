@@ -1,0 +1,223 @@
+@model VeSuKienWeb.Models.Admin.SuKienChiTietVM
+
+@{
+    ViewData["Title"] = "Chi tiết sự kiện";
+
+    var sk = Model?.SuKien;
+    var loai = Model?.LoaiSuKien;
+    var toChuc = Model?.ToChuc;
+    var diaDiem = Model?.DiaDiem;
+    var online = Model?.SuKienTrucTuyen;
+
+    var loaiTen = loai?.TenLoai ?? "";
+    var loaiLower = loaiTen.ToLower();
+
+    // ⭐ Hiển thị trạng thái tiếng Việt + màu sắc (fix CS8600/CS8602)
+    string tt = sk?.TrangThaiDuyet ?? "Khác";
+
+    string trangThaiHienThi = tt switch
+    {
+        "ChoDuyet" => "Chờ duyệt",
+        "DaDuyet"  => "Đã duyệt",
+        "TuChoi"   => "Từ chối",
+        _ => tt
+    };
+
+    string mauTrangThai = tt switch
+    {
+        "ChoDuyet" => "bg-warning text-dark",
+        "DaDuyet"  => "bg-success",
+        "TuChoi"   => "bg-danger",
+        _ => "bg-secondary"
+    };
+}
+
+<h2 class="mb-3">Chi tiết sự kiện cần duyệt</h2>
+
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["ThongBao"]
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-light">
+                <strong>@(sk?.TenSuKien ?? "Không rõ tên")</strong>
+
+                <span class="badge bg-secondary ms-2">
+                    @(loai?.TenLoai ?? "Không rõ loại")
+                </span>
+
+                <span class="badge @mauTrangThai ms-2">
+                    @trangThaiHienThi
+                </span>
+            </div>
+
+            <div class="card-body">
+                <p class="mb-2 text-muted">
+                    @(sk?.ThoiGianBatDau.ToString("dd/MM/yyyy HH:mm") ?? "--/--")
+                    &rarr;
+                    @(sk?.ThoiGianKetThuc.ToString("dd/MM/yyyy HH:mm") ?? "--/--")
+                </p>
+
+                <p>
+                    <strong>Mô tả chi tiết:</strong><br />
+                    @if (!string.IsNullOrWhiteSpace(sk?.MoTaChiTiet))
+                    {
+                        @sk!.MoTaChiTiet
+                    }
+                    else
+                    {
+                        <em>(Chưa có mô tả)</em>
+                    }
+                </p>
+
+                <p class="mb-1">
+                    <strong>Ngày đăng:</strong>
+                    @(sk?.NgayDang.ToString("dd/MM/yyyy HH:mm") ?? "--/--")
+                </p>
+
+                <p class="mb-1">
+                    <strong>Số lượng tối đa:</strong>
+                    @(sk?.SoLuongToiDa?.ToString() ?? "Chưa cấu hình")
+                </p>
+
+                <p class="mb-0">
+                    <strong>Giá vé mặc định:</strong>
+                    @(sk?.GiaVeMacDinh.HasValue == true ? sk.GiaVeMacDinh.Value.ToString("N0") + " đ" : "Chưa đặt")
+                </p>
+            </div>
+        </div>
+
+        <!-- LOẠI VÉ -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-light"><strong>Các loại vé</strong></div>
+
+            <div class="card-body">
+                @if (Model?.LoaiVes != null && Model.LoaiVes.Any())
+                {
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tên loại vé</th>
+                                <th>Giá vé</th>
+                                <th>Số lượng</th>
+                                <th>Mô tả</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var v in Model.LoaiVes)
+                            {
+                                <tr>
+                                    <td>@v.TenLoai</td>
+                                    <td>@v.GiaVe.ToString("N0") đ</td>
+                                    <td>@v.SoLuong</td>
+                                    <td>@(string.IsNullOrWhiteSpace(v.MoTa) ? "-" : v.MoTa)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <em>Chưa cấu hình loại vé.</em>
+                }
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CỘT PHẢI -->
+    <div class="col-md-4">
+
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-light"><strong>Thông tin tổ chức</strong></div>
+            <div class="card-body">
+                @if (toChuc != null)
+                {
+                    <p><strong>Tên tổ chức:</strong> @toChuc.TenToChuc</p>
+                    <p><strong>Email:</strong> @toChuc.EmailLienHe</p>
+                    <p><strong>Mô tả:</strong><br /> @(toChuc.MoTa ?? "(Không có mô tả)")</p>
+                }
+                else
+                {
+                    <em>Không có thông tin tổ chức.</em>
+                }
+            </div>
+        </div>
+
+        <!-- TRỰC TIẾP -->
+        @if (loaiLower.Contains("trực tiếp") || loaiLower.Contains("truc tiep") || loaiLower.Contains("hybrid"))
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light"><strong>Sự kiện trực tiếp</strong></div>
+                <div class="card-body">
+                    @if (diaDiem != null)
+                    {
+                        <p><strong>Địa điểm:</strong> @diaDiem.TenDiaDiem</p>
+                        <p><strong>Địa chỉ:</strong> @diaDiem.DiaChi</p>
+                        <p><strong>Số ghế:</strong> @diaDiem.SoChoNgoi</p>
+
+                        @if (!string.IsNullOrWhiteSpace(diaDiem.BanDo))
+                        {
+                            <p><strong>Bản đồ:</strong>
+                                <a href="@diaDiem.BanDo" target="_blank">Xem</a>
+                            </p>
+                        }
+                    }
+                    else
+                    {
+                        <em>Chưa có dữ liệu địa điểm.</em>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- TRỰC TUYẾN -->
+        @if (loaiLower.Contains("trực tuyến") || loaiLower.Contains("online") || loaiLower.Contains("truc tuyen") || loaiLower.Contains("hybrid"))
+        {
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light"><strong>Sự kiện trực tuyến</strong></div>
+                <div class="card-body">
+                    @if (online != null)
+                    {
+                        <p><strong>Nền tảng:</strong> @online.NenTang</p>
+                        <p><strong>Link xem:</strong> <a href="@online.LinkXem" target="_blank">@online.LinkXem</a></p>
+                        <p><strong>Mật khẩu:</strong> @(online.MatKhauPhong ?? "(Không có)")</p>
+                        <p><strong>Hướng dẫn:</strong><br /> @(online.HuongDan ?? "(Không có)")</p>
+                    }
+                    else
+                    {
+                        <em>Chưa có dữ liệu trực tuyến.</em>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- DUYỆT -->
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <p class="mb-3">Trạng thái: <strong>@trangThaiHienThi</strong></p>
+
+                <form asp-action="Duyet" asp-route-id="@sk?.SuKienId" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success btn-sm">Duyệt</button>
+                </form>
+
+                <form asp-action="TuChoi" asp-route-id="@sk?.SuKienId" method="post" class="d-inline ms-2">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger btn-sm">Từ chối</button>
+                </form>
+
+                <div class="mt-3">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Quay về danh sách</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
