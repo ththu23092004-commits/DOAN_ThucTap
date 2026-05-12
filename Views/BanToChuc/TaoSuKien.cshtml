@@ -5,6 +5,14 @@
 
 <h2 class="mb-3">Tạo sự kiện mới</h2>
 
+<style>
+    .required-mark {
+        color: #dc3545;
+        font-weight: 700;
+        margin-left: 2px;
+    }
+</style>
+
 <div class="card shadow-sm">
     <div class="card-body">
         <form asp-action="TaoSuKien" method="post" enctype="multipart/form-data">
@@ -16,7 +24,7 @@
                 <div class="col-md-6">
 
                     <div class="mb-3">
-                        <label asp-for="TenSuKien" class="form-label"></label>
+                        <label asp-for="TenSuKien" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="TenSuKien" class="form-control" />
                         <span asp-validation-for="TenSuKien" class="text-danger small"></span>
                     </div>
@@ -35,7 +43,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="LoaiId" class="form-label"></label>
+                        <label asp-for="LoaiId" class="form-label"></label><span class="required-mark">*</span>
                         <select asp-for="LoaiId" asp-items="ViewBag.LoaiId" class="form-select" id="LoaiId"></select>
                         <span asp-validation-for="LoaiId" class="text-danger small"></span>
                     </div>
@@ -45,7 +53,7 @@
                 <div class="col-md-6">
 
                     <div class="mb-3">
-                        <label asp-for="ThoiGianBatDau" class="form-label"></label>
+                        <label asp-for="ThoiGianBatDau" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="ThoiGianBatDau"
                                type="datetime-local"
                                class="form-control"
@@ -54,7 +62,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="ThoiGianKetThuc" class="form-label"></label>
+                        <label asp-for="ThoiGianKetThuc" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="ThoiGianKetThuc"
                                type="datetime-local"
                                class="form-control"
@@ -84,7 +92,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label asp-for="TenDiaDiem" class="form-label"></label>
+                        <label asp-for="TenDiaDiem" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="TenDiaDiem" class="form-control" />
                         <span asp-validation-for="TenDiaDiem" class="text-danger small"></span>
                     </div>
@@ -97,7 +105,7 @@
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label asp-for="SoChoNgoi" class="form-label"></label>
+                        <label asp-for="SoChoNgoi" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="SoChoNgoi" type="number" class="form-control" />
                         <span asp-validation-for="SoChoNgoi" class="text-danger small"></span>
                     </div>
@@ -111,22 +119,22 @@
                 <!-- HÀNG CẤU HÌNH SƠ ĐỒ GHẾ A1, A2... & KHU VIP/THƯỜNG -->
                 <div class="row">
                     <div class="col-md-3 mb-3">
-                        <label asp-for="SoHang" class="form-label"></label>
+                        <label asp-for="SoHang" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="SoHang" type="number" class="form-control" />
                         <span asp-validation-for="SoHang" class="text-danger small"></span>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label asp-for="SoCotMoiHang" class="form-label"></label>
+                        <label asp-for="SoCotMoiHang" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="SoCotMoiHang" type="number" class="form-control" />
                         <span asp-validation-for="SoCotMoiHang" class="text-danger small"></span>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label asp-for="HangVipTu" class="form-label"></label>
+                        <label asp-for="HangVipTu" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="HangVipTu" type="number" class="form-control" placeholder="VD: 1 (hàng A)" />
                         <span asp-validation-for="HangVipTu" class="text-danger small"></span>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label asp-for="HangVipDen" class="form-label"></label>
+                        <label asp-for="HangVipDen" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="HangVipDen" type="number" class="form-control" placeholder="VD: 2 (hàng B)" />
                         <span asp-validation-for="HangVipDen" class="text-danger small"></span>
                     </div>
@@ -136,17 +144,17 @@
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label asp-for="TenLoaiVe1" class="form-label"></label>
+                        <label asp-for="TenLoaiVe1" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="TenLoaiVe1" class="form-control" placeholder="VD: VIP" />
                         <span asp-validation-for="TenLoaiVe1" class="text-danger small"></span>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label asp-for="GiaVe1" class="form-label"></label>
+                        <label asp-for="GiaVe1" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="GiaVe1" type="number" step="1000" class="form-control" />
                         <span asp-validation-for="GiaVe1" class="text-danger small"></span>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label asp-for="SoLuongVe1" class="form-label"></label>
+                        <label asp-for="SoLuongVe1" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="SoLuongVe1" type="number" class="form-control" />
                         <span asp-validation-for="SoLuongVe1" class="text-danger small"></span>
                     </div>
@@ -175,11 +183,11 @@
             <div id="block-workshop" style="display:none;">
                 <hr />
                 <h5 class="mb-1">Thông tin workshop</h5>
-                <div class="small text-muted mb-3">Workshop dùng sơ đồ ghế chữ U cố định 30 ghế (5 hàng x 6 ghế).</div>
+                <div class="small text-muted mb-3">Workshop chỉ cần nhập tổng số ghế, hệ thống sẽ tự tạo sơ đồ ghế phù hợp.</div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label asp-for="TenDiaDiem" class="form-label"></label>
+                        <label asp-for="TenDiaDiem" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="TenDiaDiem" class="form-control" />
                         <span asp-validation-for="TenDiaDiem" class="text-danger small"></span>
                     </div>
@@ -191,50 +199,27 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label asp-for="SoChoNgoi" class="form-label"></label>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SoChoNgoi" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="SoChoNgoi" type="number" class="form-control" />
                         <span asp-validation-for="SoChoNgoi" class="text-danger small"></span>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label asp-for="SoHang" class="form-label"></label>
-                        <input asp-for="SoHang" type="number" class="form-control" />
-                        <span asp-validation-for="SoHang" class="text-danger small"></span>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label asp-for="SoCotMoiHang" class="form-label"></label>
-                        <input asp-for="SoCotMoiHang" type="number" class="form-control" />
-                        <span asp-validation-for="SoCotMoiHang" class="text-danger small"></span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="HangVipTu" class="form-label"></label>
-                        <input asp-for="HangVipTu" type="number" class="form-control" />
-                        <span asp-validation-for="HangVipTu" class="text-danger small"></span>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="HangVipDen" class="form-label"></label>
-                        <input asp-for="HangVipDen" type="number" class="form-control" />
-                        <span asp-validation-for="HangVipDen" class="text-danger small"></span>
                     </div>
                 </div>
 
                 <h6 class="mb-2 mt-2">Cấu hình loại vé workshop</h6>
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label asp-for="TenLoaiVe1" class="form-label"></label>
+                        <label asp-for="TenLoaiVe1" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="TenLoaiVe1" class="form-control" placeholder="VD: VIP" />
                         <span asp-validation-for="TenLoaiVe1" class="text-danger small"></span>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label asp-for="GiaVe1" class="form-label"></label>
+                        <label asp-for="GiaVe1" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="GiaVe1" type="number" step="1000" class="form-control" />
                         <span asp-validation-for="GiaVe1" class="text-danger small"></span>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label asp-for="SoLuongVe1" class="form-label"></label>
+                        <label asp-for="SoLuongVe1" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="SoLuongVe1" type="number" class="form-control" />
                         <span asp-validation-for="SoLuongVe1" class="text-danger small"></span>
                     </div>
@@ -265,12 +250,12 @@
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label asp-for="NenTang" class="form-label"></label>
+                        <label asp-for="NenTang" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="NenTang" class="form-control" placeholder="Zoom, Google Meet, YouTube..." />
                         <span asp-validation-for="NenTang" class="text-danger small"></span>
                     </div>
                     <div class="col-md-8 mb-3">
-                        <label asp-for="LinkXem" class="form-label"></label>
+                        <label asp-for="LinkXem" class="form-label"></label><span class="required-mark">*</span>
                         <input asp-for="LinkXem" class="form-control" />
                         <span asp-validation-for="LinkXem" class="text-danger small"></span>
                     </div>
@@ -294,7 +279,7 @@
 
                 <div class="row">
                     <div class="col-md-12 mb-2">
-                        <label class="form-label">Tên loại vé trực tuyến</label>
+                        <label class="form-label">Tên loại vé trực tuyến</label><span class="required-mark">*</span>
                         <input type="text"
                                id="TenLoaiVeOnline"
                                class="form-control"
@@ -376,22 +361,6 @@
                 fields.forEach(function (f) { f.disabled = !enabled; });
             }
 
-            function applyWorkshopSeatPreset(enabled) {
-                // Có 2 block cùng dùng asp-for nên phải set cho toàn bộ phần tử cùng name
-                var soChoNgoiFields = document.querySelectorAll('input[name="SoChoNgoi"]');
-                var soHangFields = document.querySelectorAll('input[name="SoHang"]');
-                var soCotFields = document.querySelectorAll('input[name="SoCotMoiHang"]');
-
-                soChoNgoiFields.forEach(function (f) {
-                    if (enabled) { f.value = 30; }
-                });
-                soHangFields.forEach(function (f) {
-                    if (enabled) { f.value = 5; }
-                });
-                soCotFields.forEach(function (f) {
-                    if (enabled) { f.value = 6; }
-                });
-            }
 
             blockTrucTiep.style.display = "none";
             blockWorkshop.style.display = "none";
@@ -401,8 +370,6 @@
             setBlockEnabled(blockTrucTuyen, false);
 
             var isWorkshop = text.includes("workshop");
-
-            applyWorkshopSeatPreset(isWorkshop);
 
             if (text.includes("truc tiep") && !isWorkshop) {
                 blockTrucTiep.style.display = "block";

@@ -275,16 +275,6 @@ namespace VeSuKienWeb.Controllers
             bool laTrucTiep = tenLoaiLower.Contains("trực tiếp") || tenLoaiLower.Contains("truc tiep");
             bool laWorkshop = tenLoaiLower.Contains("workshop");
 
-            // Workshop: giữ preset ở UI, nhưng backend cho phép organizer tùy chỉnh số ghế/hàng/cột.
-            if (laWorkshop)
-            {
-                // Khoảng VIP mặc định hợp lệ nếu người dùng để trống.
-                if (!model.HangVipTu.HasValue || model.HangVipTu.Value < 1)
-                    model.HangVipTu = 1;
-                if (!model.HangVipDen.HasValue || model.HangVipDen.Value < model.HangVipTu.Value)
-                    model.HangVipDen = 2;
-            }
-
             // ===== VALIDATE THEO LOẠI SỰ KIỆN =====
             if (laTrucTiep || laWorkshop)
             {
@@ -325,31 +315,34 @@ namespace VeSuKienWeb.Controllers
                     ModelState.AddModelError("SoChoNgoi", "Tổng số lượng vé vượt quá tổng số ghế.");
                 }
 
-                if (model.SoHang == null || model.SoHang <= 0)
-                    ModelState.AddModelError("SoHang", "Vui lòng nhập số hàng ghế > 0.");
-
-                if (model.SoCotMoiHang == null || model.SoCotMoiHang <= 0)
-                    ModelState.AddModelError("SoCotMoiHang", "Vui lòng nhập số ghế mỗi hàng > 0.");
-
-                if (model.HangVipTu == null || model.HangVipDen == null)
+                if (!laWorkshop)
                 {
-                    ModelState.AddModelError("HangVipTu", "Vui lòng nhập khoảng hàng VIP (từ hàng nào đến hàng nào).");
-                }
-                else
-                {
-                    if (model.HangVipTu < 1 || model.HangVipDen < model.HangVipTu)
-                        ModelState.AddModelError("HangVipTu", "Khoảng hàng VIP không hợp lệ.");
+                    if (model.SoHang == null || model.SoHang <= 0)
+                        ModelState.AddModelError("SoHang", "Vui lòng nhập số hàng ghế > 0.");
 
-                    if (model.SoHang.HasValue && model.HangVipDen > model.SoHang.Value)
-                        ModelState.AddModelError("HangVipDen", "Hàng VIP tối đa không được vượt quá tổng số hàng.");
-                }
+                    if (model.SoCotMoiHang == null || model.SoCotMoiHang <= 0)
+                        ModelState.AddModelError("SoCotMoiHang", "Vui lòng nhập số ghế mỗi hàng > 0.");
 
-                if (model.SoChoNgoi.HasValue && model.SoHang.HasValue && model.SoCotMoiHang.HasValue)
-                {
-                    int gheTinh = model.SoHang.Value * model.SoCotMoiHang.Value;
-                    if (model.SoChoNgoi.Value != gheTinh)
+                    if (model.HangVipTu == null || model.HangVipDen == null)
                     {
-                        ModelState.AddModelError("SoChoNgoi", "Tổng số ghế phải bằng Số hàng × Số ghế mỗi hàng.");
+                        ModelState.AddModelError("HangVipTu", "Vui lòng nhập khoảng hàng VIP (từ hàng nào đến hàng nào).");
+                    }
+                    else
+                    {
+                        if (model.HangVipTu < 1 || model.HangVipDen < model.HangVipTu)
+                            ModelState.AddModelError("HangVipTu", "Khoảng hàng VIP không hợp lệ.");
+
+                        if (model.SoHang.HasValue && model.HangVipDen > model.SoHang.Value)
+                            ModelState.AddModelError("HangVipDen", "Hàng VIP tối đa không được vượt quá tổng số hàng.");
+                    }
+
+                    if (model.SoChoNgoi.HasValue && model.SoHang.HasValue && model.SoCotMoiHang.HasValue)
+                    {
+                        int gheTinh = model.SoHang.Value * model.SoCotMoiHang.Value;
+                        if (model.SoChoNgoi.Value != gheTinh)
+                        {
+                            ModelState.AddModelError("SoChoNgoi", "Tổng số ghế phải bằng Số hàng × Số ghế mỗi hàng.");
+                        }
                     }
                 }
             }
@@ -468,7 +461,63 @@ namespace VeSuKienWeb.Controllers
 
                 await _db.SaveChangesAsync();
 
-                if (model.SoHang.HasValue && model.SoCotMoiHang.HasValue)
+                if (laWorkshop)
+                {
+                    int tongGheWorkshop = model.SoChoNgoi ?? 0;
+
+                    // Quy ước workshop: 2 cánh dọc (trái/phải) là VIP, dãy đáy là thường.
+                    int moiCanh = Math.Max(1, tongGheWorkshop / 4);
+                    int gheDay = tongGheWorkshop - (moiCanh * 2);
+                    if (gheDay < 1)
+                    {
+                        gheDay = 1;
+                        moiCanh = Math.Max(1, (tongGheWorkshop - 1) / 2);
+                    }
+
+                    int loaiVipId = loaiVeVip?.LoaiVeId ?? loaiVeThuong?.LoaiVeId ?? 0;
+                    int loaiThuongId = loaiVeThuong?.LoaiVeId ?? loaiVeVip?.LoaiVeId ?? 0;
+                    if (loaiVipId == 0 || loaiThuongId == 0)
+                        return RedirectToAction("Index");
+
+                    for (int c = 1; c <= moiCanh; c++)
+                    {
+                        _db.SoDoChoNgoi.Add(new SoDoChoNgoi
+                        {
+                            DiaDiemId = diaDiem.DiaDiemId,
+                            Hang = "A",
+                            Cot = c,
+                            TrangThai = "Trong",
+                            LoaiVeId = loaiVipId
+                        });
+                    }
+
+                    for (int c = 1; c <= moiCanh; c++)
+                    {
+                        _db.SoDoChoNgoi.Add(new SoDoChoNgoi
+                        {
+                            DiaDiemId = diaDiem.DiaDiemId,
+                            Hang = "B",
+                            Cot = c,
+                            TrangThai = "Trong",
+                            LoaiVeId = loaiVipId
+                        });
+                    }
+
+                    for (int c = 1; c <= gheDay; c++)
+                    {
+                        _db.SoDoChoNgoi.Add(new SoDoChoNgoi
+                        {
+                            DiaDiemId = diaDiem.DiaDiemId,
+                            Hang = "C",
+                            Cot = c,
+                            TrangThai = "Trong",
+                            LoaiVeId = loaiThuongId
+                        });
+                    }
+
+                    await _db.SaveChangesAsync();
+                }
+                else if (model.SoHang.HasValue && model.SoCotMoiHang.HasValue)
                 {
                     int soHang = model.SoHang.Value;
                     int soCot = model.SoCotMoiHang.Value;
